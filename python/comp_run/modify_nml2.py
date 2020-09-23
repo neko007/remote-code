@@ -13,8 +13,8 @@ model_dir = '/home/zzhzhao/Model'
 test_number = ''
 
 # 驱动场资料路径
-data_file = 'GFS_*'
-sst_file = ' '
+data_file = '驱动场'
+sst_file = '海温场'
 
 # 驱动场资料时间间隔
 interval_hours = 6
@@ -68,7 +68,7 @@ dy = 30000
 time_step = dx / 1000 * 4
 
 # 引入海温场
-sst_file = 1
+sst_flag = 1
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # 不经常修改的部分

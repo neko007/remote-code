@@ -25,29 +25,29 @@ def run_wps(sst_flag):
     rewrite_namelist(wps_dir, wps_nml_name, nml_wps, 1)
     # geogrid 地形插值
     print('>>>> geogrid.exe <<<<')
-    sp.run('./geogrid.exe >& log.geogrid', shell=True)
+    sp.run('./geogrid.exe >& geogrid.log', shell=True)
     # 链接数据
     print('>>>> link data <<<<')
     sp.run('ln -sf ungrib/Variable_Tables/Vtable.GFS Vtable', shell=True)
     sp.run('./link_grib.csh ' + os.path.join(data_dir, data_file), shell=True)
     # ungrid 解码
     print('>>>> ungrib.exe <<<<')
-    sp.run('./ungrib.exe', shell=True)
+    sp.run('./ungrib.exe >& ungrib.log', shell=True)
     if sst_flag == 1:
         # 链接海温场
         print('>>>> prepare SST data <<<<')
         sp.run('ln -sf ungrib/Variable_Tables/Vtable.SST Vtable', shell=True)
         sp.run('./link_grib.csh ' + os.path.join(data_dir, sst_file), shell=True)
         # 修改namelist.wps
-        nml_wps = modify_nml_wps(1)
+        nml_wps = modify_wps_nml(1)
         # 复写 namelist.wps
         rewrite_namelist(wps_dir, wps_nml_name, nml_wps, 1)
         # ungrid 解码
         print('>>>> ungrib.exe <<<<')
-        sp.run('./ungrib.exe', shell=True)
+        sp.run('./ungrib.exe >& ungrib.log', shell=True)
     # metgrid 气象场插值
     print('>>>> metgrid.exe <<<<')
-    sp.run('./metgrid.exe', shell=True)
+    sp.run('./metgrid.exe > metgrid.log', shell=True)
 
 
 # 运行WRF
