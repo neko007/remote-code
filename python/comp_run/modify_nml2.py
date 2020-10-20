@@ -34,8 +34,8 @@ restart = False
 restart_interval = 1440 # minute
 
 # 文件输出时间间隔(min)、文件打包个数
-history_interval = [120, 120, 60]
-frames_per_outfile = [3, 3, 100]
+history_interval = [60, 60, 60]
+frames_per_outfile = [6, 6, 100]
 
 # 嵌套区域相关配置
 max_dom = 1
@@ -68,7 +68,13 @@ dy = 30000
 time_step = dx / 1000 * 4
 
 # 引入海温场
-sst_flag = 1
+sst_flag = 0
+
+# lake
+sf_lake_physics = 1
+
+# chem
+chem = 0
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # 不经常修改的部分
@@ -87,6 +93,9 @@ geog_data_path = os.path.join(model_dir, 'Build_WRF/WPS_GEOG') # 静态地形资
 map_proj = 'lambert'
 truelat1 = 30. 
 truelat2 = 60. 
+
+# 地形资料分辨率
+geog_data_res = 'modis_lake+default'
 
 # ungrib
 prefix = 'FILE'
@@ -160,6 +169,7 @@ def modify_wps_nml(sst_update):
     nml_wps['geogrid']['truelat2'] = truelat2
     nml_wps['geogrid']['stand_lon'] = stand_lon 
     nml_wps['geogrid']['geog_data_path'] = geog_data_path
+    nml_wps['geogrid']['geog_data_res'] = [geog_data_res] * max_dom
 
     nml_wps['ungrib']['prefix'] = prefix
     if sst_update == 1:
@@ -205,5 +215,34 @@ def modify_wrf_nml(sst_update):
     if sst_update == 1:
         nml_wrf['time_control'].update({'auxinput4_inname':'wrflowinp_d<domain>', 'auxinput4_interval':360, 'io_form_auxinput4':2})
         nml_wrf['physics'].update({'sst_update':sst_update})
+    
+    # lake
+    if sf_lake_physics == 1:
+        nml_wrf['physics'].update({'sf_lake_physics':[1] * max_dom})
+        nml_wrf['physics'].update({'lakedepth_default':[50] * max_dom})
+        nml_wrf['physics'].update({'lake_min_elev':[5] * max_dom})
+        nml_wrf['physics'].update({'use_lakedepth':[1] * max_dom})
+
+    # chem
+    if chem == 1:
+        # 将namelist.input.chem的&chem导入到namelist.input
+        nml_wrf_chem = f90nml.read(os.path.join(wrf_dir, 'test', 'em_real', 'namelist.input.chem'))
+        nml_wrf['chem'] = nml_wrf_chem['chem']
+
+        nml_wrf['chem']['chem_opt'] = [300] * max_dom
+        nml_wrf['chem']['kemit'] = [1] * max_dom 
+        nml_wrf['chem']['chemdt'] = [20] * max_dom 
+        nml_wrf['chem']['emiss_inpt_opt'] = [0] * max_dom
+        nml_wrf['chem']['emiss_opt'] = [0] * max_dom
+        nml_wrf['chem']['io_style_emissions'] = [0] * max_dom
+        nml_wrf['chem']['phot_opt'] = [0] * max_dom 
+        nml_wrf['chem']['bio_emiss_opt'] = [0] * max_dom
+        nml_wrf['chem'].update({'ne_area':[200] * max_dom})
+        nml_wrf['chem'].update({'depo_fact':0.25 * max_dom})
+        nml_wrf['chem']['dust_opy'] = [1] * max_dom
+        nml_wrf['chem'].update({'aer_op_opt':[1] * max_dom})
+        nml_wrf['chem'].update({'opt_pars_out':[1] * max_dom})
+        nml_wrf['domains']['e_vert'] = [33] * max_dom # namelist.input.chem的e_vert默认是20
+
 
     return nml_wrf
