@@ -12,7 +12,7 @@ core_num = 16
 model_dir = '/home/zzhzhao/Model'
 test_number = ''
 
-# 驱动场资料路径
+# 驱动场资料名称
 data_file = '驱动场'
 sst_file = '海温场'
 
@@ -64,9 +64,6 @@ lon_maxs = [
 dx = 30000
 dy = 30000
 
-# 积分步长
-time_step = dx / 1000 * 4
-
 # 引入海温场
 sst_flag = 0
 
@@ -75,6 +72,18 @@ sf_lake_physics = 1
 
 # chem
 chem = 0
+
+# **********
+# 参数化方案
+# **********
+
+mp_physics = 3
+cu_physics = 1
+ra_lw_physics = 1
+ra_sw_physics = 1
+bl_pbl_physics = 1
+sf_sfclay_physics = 1
+sf_surface_physics = 2
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # 不经常修改的部分
@@ -99,6 +108,9 @@ geog_data_res = 'modis_lake+default'
 
 # ungrib
 prefix = 'FILE'
+
+# 积分步长
+time_step = dx / 1000 * 4
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # 自动计算部分
@@ -183,6 +195,7 @@ def modify_wrf_nml(sst_update):
     读取并修改namelist.input 
     '''
     nml_wrf = f90nml.read(os.path.join(wrf_dir, 'run', wrf_nml_name))
+    # 时间控制
     nml_wrf['time_control']['run_days'] = run_days
     nml_wrf['time_control']['run_hours'] = run_hours
     nml_wrf['time_control']['start_year'] = [y_start for i in range(max_dom)]
@@ -199,6 +212,7 @@ def modify_wrf_nml(sst_update):
     nml_wrf['time_control']['restart'] = restart
     nml_wrf['time_control']['restart_interval'] = restart_interval
 
+    # 区域设置
     nml_wrf['domains']['max_dom'] = max_dom
     nml_wrf['domains']['time_step'] = time_step
     nml_wrf['domains']['e_we'] = e_wes
@@ -212,6 +226,16 @@ def modify_wrf_nml(sst_update):
     nml_wrf['domains']['parent_grid_ratio'] = parent_grid_ratios
     nml_wrf['domains']['parent_time_step_ratio'] = parent_grid_ratios
     nml_wrf['domains'].update({'sfcp_to_sfcp':True})
+
+    # 参数化方案
+    nml_wrf['physics']['mp_physics'] = [mp_physics] * max_dom
+    nml_wrf['physics']['cu_physics'] = [cu_physics] * max_dom
+    nml_wrf['physics']['ra_lw_physics'] = [ra_lw_physics] * max_dom
+    nml_wrf['physics']['ra_sw_physics'] = [ra_sw_physics] * max_dom
+    nml_wrf['physics']['bl_pbl_physics'] = [bl_pbl_physics] * max_dom
+    nml_wrf['physics']['sf_sfclay_physics'] = [sf_sfclay_physics] * max_dom
+    nml_wrf['physics']['sf_surface_physics'] = [sf_surface_physics] * max_dom
+
     if sst_update == 1:
         nml_wrf['time_control'].update({'auxinput4_inname':'wrflowinp_d<domain>', 'auxinput4_interval':360, 'io_form_auxinput4':2})
         nml_wrf['physics'].update({'sst_update':sst_update})
@@ -238,8 +262,8 @@ def modify_wrf_nml(sst_update):
         nml_wrf['chem']['phot_opt'] = [0] * max_dom 
         nml_wrf['chem']['bio_emiss_opt'] = [0] * max_dom
         nml_wrf['chem'].update({'ne_area':[200] * max_dom})
-        nml_wrf['chem'].update({'depo_fact':0.25 * max_dom})
-        nml_wrf['chem']['dust_opy'] = [1] * max_dom
+        nml_wrf['chem'].update({'depo_fact':[0.25] * max_dom})
+        nml_wrf['chem']['dust_opt'] = [1] * max_dom
         nml_wrf['chem'].update({'aer_op_opt':[1] * max_dom})
         nml_wrf['chem'].update({'opt_pars_out':[1] * max_dom})
         nml_wrf['domains']['e_vert'] = [33] * max_dom # namelist.input.chem的e_vert默认是20
