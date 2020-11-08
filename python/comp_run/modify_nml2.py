@@ -112,6 +112,10 @@ prefix = 'FILE'
 # 积分步长
 time_step = dx / 1000 * 4
 
+# wrfout输出路径
+wrfout_path = f'/home/zzhzhao/Model/wrfout/{test_number}'
+wrfout_file = 'wrfout_d<domain>_<date>.nc'
+
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # 自动计算部分
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -195,6 +199,7 @@ def modify_wrf_nml(sst_update):
     读取并修改namelist.input 
     '''
     nml_wrf = f90nml.read(os.path.join(wrf_dir, 'run', wrf_nml_name))
+
     # 时间控制
     nml_wrf['time_control']['run_days'] = run_days
     nml_wrf['time_control']['run_hours'] = run_hours
@@ -211,6 +216,7 @@ def modify_wrf_nml(sst_update):
     nml_wrf['time_control']['frames_per_outfile'] = frames_per_outfile
     nml_wrf['time_control']['restart'] = restart
     nml_wrf['time_control']['restart_interval'] = restart_interval
+    nml_wrf['time_control'].update({'history_outname':os.path.join(wrfout_path, wrfout_file)})
 
     # 区域设置
     nml_wrf['domains']['max_dom'] = max_dom

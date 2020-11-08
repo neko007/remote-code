@@ -62,6 +62,12 @@ def run_wrf(sst_flag):
     # 生成初始场
     print('>>>> real.exe <<<<')
     sp.run('mpirun -np 1 ./real.exe', shell=True)
+    # 新建wrfout输出文件夹
+    if os.path.exists(wrfout_path):
+        print('*** Warning: path exists ***')
+    else:
+        print('>>>> mkdir wrfout_path <<<<')
+        sp.run(f'mkdir {wrfout_path}', shell=True)
     # 运行wrf
     print('>>>> wrf.exe <<<<')
     sp.run(f'mpirun -np {core_num} ./wrf.exe', shell=True)
