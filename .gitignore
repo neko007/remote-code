@@ -1,3 +1,15 @@
+*.nc
+*.png
+*.jpg
+*.excel
+*.txt
+*.csv
+*.grib2
+*.grb
+*.grb2
+*.grib
+shpfiles/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

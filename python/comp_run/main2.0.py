@@ -28,7 +28,7 @@ def run_wps(sst_flag):
     sp.run('./geogrid.exe >& geogrid.log', shell=True)
     # 链接数据
     print('>>>> link data <<<<')
-    sp.run('ln -sf ungrib/Variable_Tables/Vtable.GFS Vtable', shell=True)
+    sp.run('ln -sf ungrib/Variable_Tables/{Vtable_type} Vtable', shell=True)
     sp.run('./link_grib.csh ' + os.path.join(data_dir, data_file), shell=True)
     # ungrid 解码
     print('>>>> ungrib.exe <<<<')
@@ -70,7 +70,7 @@ def run_wrf(sst_flag):
         sp.run(f'mkdir {wrfout_path}', shell=True)
     # 运行wrf
     print('>>>> wrf.exe <<<<')
-    sp.run(f'mpirun -np {core_num} ./wrf.exe', shell=True)
+    sp.run(f'nohup mpirun -np {core_num} ./wrf.exe 2>&1 &', shell=True)
 
 # 复写namelist
 def rewrite_namelist(target_dir, nml_name, nml, flag):

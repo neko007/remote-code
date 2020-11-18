@@ -109,8 +109,11 @@ geog_data_res = 'modis_lake+default'
 # ungrib
 prefix = 'FILE'
 
+# 驱动场资料类型
+Vtable_type = 'Vtable.GFS'
+
 # 积分步长
-time_step = dx / 1000 * 4
+time_step = dx / 1000 * 5
 
 # wrfout输出路径
 wrfout_path = f'/home/zzhzhao/Model/wrfout/{test_number}'

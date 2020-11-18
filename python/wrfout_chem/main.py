@@ -178,7 +178,9 @@ if __name__ == '__main__':
     with ThreadPoolExecutor(max_workers=8) as executor:
         executor.map(add_province, axes.ravel())
 
-    fig.colorbar(c, ax=axes, orientation='horizontal', pad=0.06, shrink=0.9, aspect=45)
+    cb = fig.colorbar(c, ax=axes, orientation='horizontal', pad=0.06, shrink=0.9, aspect=45)
+    cb.set_label('Geopotential Height (gpm)', fontsize=12)
+
     fig.savefig('fig/gh.jpg')
 
 #%%

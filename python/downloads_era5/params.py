@@ -1,8 +1,8 @@
-Target_dir = '../data'
-DATE1 = '20200801'
-DATE2 = '20200802'
-Nort = 65
+Target_dir = '/home/zzhzhao/Model/tests/test-9.2-ERA5/data'
+DATE1 = '20170721'
+DATE2 = '20170805'
+Nort = 53
 Sout = 10
-West = 70
-East = 155
+West = 67
+East = 113
 time_interval = 6
