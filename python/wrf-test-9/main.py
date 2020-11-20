@@ -86,7 +86,7 @@ if __name__ == '__main__':
     lat, lon = trmm.LAT, trmm.LON
     # CMORPH
     cmorph_file = '/home/Public_Data/CMORPH_V1.0_CRT_3hr/201706.3hly.nc'
-    cmorph = xr.open_dataset(cmorph_file)['cmorph'].sel(time=time)
+    cmorph = xr.open_dataset(cmorph_file)['cmorph'].sel(time=time+pd.Timedelta('3H'))
 
     ### 站点观测
     df = pd.read_excel('data/纳木错站2017-2018.xlsx', index_col=0)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     NamCo_position = nearest_position(NamCo_latlon, lats, lons)
     prec_NamCo = prec.sel(south_north=NamCo_position[0], west_east=NamCo_position[1])
     trmm_NamCo = trmm.sel(LAT=NamCo_latlon[0], LON=NamCo_latlon[1], method='ffill')
-    cmorph_NamCo = cmorph..sel(lat=NamCo_latlon[0], lon=NamCo_latlon[1], method='ffill')
+    cmorph_NamCo = cmorph.sel(lat=NamCo_latlon[0], lon=NamCo_latlon[1], method='ffill')
 
     plt.style.use(['science', 'ieee'])
     fig, ax = plt.subplots(figsize=(6,3))

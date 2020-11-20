@@ -1,18 +1,5 @@
 #%%
-import numpy as np
-import pandas as pd
-import xarray as xr
-import matplotlib.pyplot as plt
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-from cartopy.feature import NaturalEarthFeature
-from netCDF4 import Dataset
-import wrf as w
-import xesmf as xe
-import cmaps
-import os 
-import warnings
-warnings.filterwarnings("ignore")
+from Module import *
 
 if __name__ == '__main__':
     ### 站点观测
@@ -22,10 +9,11 @@ if __name__ == '__main__':
 
     # plt.style.use(['science', 'ieee'])
     fig, ax = plt.subplots(figsize=(8,4))
-    ax.plot(obs_NamCo.index, obs_NamCo, lw=1.2, c='b', label='OBS')#, marker='o', mfc=None, markersize=1.4)
+    ax.plot(obs_NamCo.index, obs_NamCo, lw=1.2, c='k', label='OBS')#, marker='o', mfc=None, markersize=1.4)
     ax.set_title('NamCo Station', loc='left', y=0.85, x=0.04, fontsize=14, weight='bold')
     ax.set_ylabel('Precipitation / $\mathrm{mmd^{-1}}$', fontsize=13)
     ax.legend(fontsize=14, loc='upper right', frameon=False)
+    ax.axvspan('2017-06-01', '2017-07-01', alpha=0.25, color='grey')
 
     import matplotlib.dates as mdate    
     ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))

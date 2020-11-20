@@ -1,18 +1,5 @@
 #%%
-import numpy as np
-import pandas as pd
-import xarray as xr
-import matplotlib.pyplot as plt
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-from cartopy.feature import NaturalEarthFeature
-from netCDF4 import Dataset
-import wrf as w
-import xesmf as xe
-import cmaps
-import os 
-import warnings
-warnings.filterwarnings("ignore")
+from Module import *
 
 def nearest_position(latlon, lats, lons):
 
@@ -64,46 +51,64 @@ def add_NamCo(ax):
     ax.add_geometries(shp2.geometry, crs=ccrs.PlateCarree(), edgecolor='k',
                       alpha=1, facecolor='none', lw=1)
     return ax
-#%%
-if __name__ == '__main__':
-    data_dir = '/home/zzhzhao/Model/wrfout/test-9.1'
-    wrf_files = [f for f in os.listdir(data_dir) if f[9]=='2']
 
+def load_wrfdata(data_dir):
+    wrf_files = [f for f in os.listdir(data_dir) if f[9]=='2']
     wrflist = [Dataset(os.path.join(data_dir, wrf_file)) for wrf_file in wrf_files]
 
     rainc = w.getvar(wrflist, 'RAINC', timeidx=w.ALL_TIMES, method='cat')
     rainnc = w.getvar(wrflist, 'RAINNC', timeidx=w.ALL_TIMES, method='cat')
     total_rain = rainc + rainnc
 
-    prec = total_rain.diff('Time', 1).sel(Time=pd.date_range('2017-06-04 3:00:00', '2017-06-8 00:00:00', freq='3H'))
+    prec = total_rain.diff('Time', 1)#.sel(Time=pd.date_range('2017-06-01 3:00:00', '2017-06-8 00:00:00', freq='3H'))
+    # prec = total_rain.isel(Time=-1)
     lats, lons = w.latlon_coords(prec)
-    time = prec.Time.to_index()
+    time = total_rain.Time.to_index() 
 
-    ### 卫星资料
-    trmm_file = 'data/obs.nc'
-    trmm = xr.open_dataset(trmm_file)['PRECIPITATION'].sel(TIME=time) * 3
+    return prec, lats, lons, time 
+
+#%%
+if __name__ == '__main__':
+    data_dir1 = '/home/zzhzhao/Model/wrfout/test-9.4'
+    data_dir2 = '/home/zzhzhao/Model/wrfout/test-9.4-nolake'
+    prec1, lats, lons, time = load_wrfdata(data_dir1)
+    prec2, lats, lons, time = load_wrfdata(data_dir2) 
+
+    lat_range = (28, 34)
+    lon_range = (86, 94)
+    ### TRMM资料
+    period = pd.date_range('2017-06-01 00:00:00', '2017-06-30 21:00:00', freq='3H')
+    trmm_file = '/home/Public_Data/TRMM/TRMM_3hr_3B42_v7/2017.nc'
+    trmm = xr.open_dataset(trmm_file)['PRECIPITATION']\
+        .sel(TIME=period).sel(LAT=slice(lat_range[0],lat_range[1]), LON=slice(lon_range[0],lon_range[1])) * 3
     lat, lon = trmm.LAT, trmm.LON
 
     ### 累计降水
-    # second_period = pd.date_range('2017-06-02 00:00:00', '2017-08-02 00:00:00', freq='6H')
     # prec_sum = prec.sel(Time=second_period).sum(dim='Time')
-    # trmm_sum = trmm.sel(TIME=second_period).sum(dim='TIME')
-    prec_sum = prec.sum(dim='Time')
-    trmm_sum = trmm.sum(dim='TIME')
+    trmm_sum = trmm.sel(TIME=period).sum(dim='TIME')
+    prec1_sum = prec1.sum(dim='Time')
+    prec2_sum = prec2.sum(dim='Time')
+
 
 #%%
-
+    ### 累计降水分布
     proj = ccrs.PlateCarree()
-    crange = np.arange(0, 30+2.5, 2.5)
-    labels = ['TRMM', 'WRF']
-    fig, axes = plt.subplots(ncols=2, nrows=1, figsize=(10,6), subplot_kw={'projection':proj})
-    # fig.subplots_adjust(hspace=0.03)
+    crange = np.arange(0, 200+10, 10)
+    labels = ['TRMM', 'WRF', 'WRF-LakeTurnOff']
+    fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(10,10), subplot_kw={'projection':proj})
+    fig.subplots_adjust(hspace=0.01)
     for i in range(2):
-        axes[i] = add_artist(axes[i], proj)
-        axes[i] = add_NamCo(axes[i])
-    c = axes[0].contourf(lon, lat, trmm_sum, vmin=2.5, levels=crange, extend='max', cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj, add_labels=False)
-    c = axes[1].contourf(lons, lats, prec_sum, vmin=2.5, levels=crange, extend='max', cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj, add_labels=False)
+        for j in range(2):
+            axes[i, j] = add_artist(axes[i, j], proj)
+            axes[i, j] = add_NamCo(axes[i, j])
+    c = axes[0][0].pcolor(lon, lat, trmm_sum, vmin=0, vmax=200, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
+    axes[0][0].set_title(labels[0], fontsize=14, weight='bold')
+    for j, prec_sum in enumerate([prec1_sum, prec2_sum]):
+        c = axes[1][j].pcolor(lons, lats, prec_sum, vmin=0, vmax=200, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
+        axes[i][j].set_title(labels[j+1], fontsize=14, weight='bold')
+    cb = fig.colorbar(c, ax=axes, orientation='horizontal', pad=0.05, shrink=0.9, aspect=35)
+    cb.set_label('Precipitation / mm', fontsize=14)
+    axes[0][1].set_visible(False)
 
-    cb = fig.colorbar(c, ax=axes, orientation='horizontal', pad=0.1, shrink=0.8, aspect=35)
-    cb.set_label('Precipitation / mm', fontsize=12)
-# %%
+    # fig.savefig('fig-test-9.4/prec.jpg', dpi=300)
+

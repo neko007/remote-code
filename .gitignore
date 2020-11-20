@@ -8,6 +8,8 @@
 *.grb
 *.grb2
 *.grib
+*.TIFF
+*.tif
 shpfiles/
 
 # Byte-compiled / optimized / DLL files

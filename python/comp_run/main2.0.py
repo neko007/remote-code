@@ -56,7 +56,7 @@ def run_wrf(sst_flag):
     nml_wrf = modify_wrf_nml(sst_flag)
     # 复写namelist.input
     rewrite_namelist(os.path.join(wrf_dir, 'run'), wrf_nml_name, nml_wrf, 2)
-    # 链接气象场
+    # 链接气象场    
     print('>>>> link met_em* <<<<')
     sp.run('ln -sf ../../WPS/met_em* .', shell=True)
     # 生成初始场
