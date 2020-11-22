@@ -32,12 +32,6 @@ if __name__ == '__main__':
     lu = geo.LU_INDEX.isel(Time=0)
     lats, lons = w.latlon_coords(w.getvar(geo._file_obj.ds, 'LU_INDEX'))
     
-    # lu = np.abs(lu - 22)
-
-
-    f_in = '/home/zzhzhao/code/shpfiles/boundary/hyd1_4m/hyd1_4p.shp'
-    shp = geopandas.read_file(f_in, encoding='gbk')
-    shp = shp.loc[shp['NAME'].isin(["纳木错"])]
     lu = lu.salem.roi(shape=shp)
     lu = np.abs(lu - 22)
 
