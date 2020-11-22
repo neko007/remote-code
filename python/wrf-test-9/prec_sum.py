@@ -47,7 +47,7 @@ def add_NamCo(ax):
     import geopandas
     f_in = '/home/zzhzhao/code/shpfiles/boundary/hyd1_4m/hyd1_4p.shp'
     shp = geopandas.read_file(f_in, encoding='gbk')
-    shp2 = pd.concat([shp[shp['NAME']=="纳木错"], shp[shp['NAME']=="色林错"]], axis=0)
+    shp2 = shp.loc[shp['NAME'].isin(["纳木错", "色林错"])]
     ax.add_geometries(shp2.geometry, crs=ccrs.PlateCarree(), edgecolor='k',
                       alpha=1, facecolor='none', lw=1)
     return ax
