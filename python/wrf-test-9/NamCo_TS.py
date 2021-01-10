@@ -3,8 +3,8 @@ from Module import *
 from prec_sum import add_artist, add_NamCo, nearest_position, load_wrfdata
 
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-9.4'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-9.4-nolake'
+    data_dir1 = '/home/zzhzhao/Model/wrfout/test-9.4-initLSWT'
+    data_dir2 = '/home/zzhzhao/Model/wrfout/test-9.4-initLSWT-laketurnoff'
     prec1, lats, lons, time = load_wrfdata(data_dir1)
     prec2, lats, lons, time = load_wrfdata(data_dir2) 
 
@@ -23,23 +23,24 @@ if __name__ == '__main__':
 
 #%%
     # NamCo station
-    NamCo_latlon = (31, 90.7)
+    NamCo_latlon = (30.75, 90.9)
     NamCo_position = nearest_position(NamCo_latlon, lats, lons)
     prec1_NamCo = prec1.sel(south_north=NamCo_position[0], west_east=NamCo_position[1]).resample(Time='1D').sum()
-    prec2_NamCo = prec1.sel(south_north=NamCo_position[0], west_east=NamCo_position[1]).resample(Time='1D').sum()
+    prec2_NamCo = prec2.sel(south_north=NamCo_position[0], west_east=NamCo_position[1]).resample(Time='1D').sum()
     trmm_NamCo = trmm.sel(LAT=NamCo_latlon[0], LON=NamCo_latlon[1], method='ffill').resample(TIME='1D').sum()
 
     fig, ax = plt.subplots(figsize=(9,4))
     ax.plot(obs_NamCo.index, obs_NamCo, lw=1.4, c='k', marker='o', mfc=None, markersize=3.5, label='OBS')
     ax.plot(prec1_NamCo.Time, prec1_NamCo, lw=1.4, c='r', marker='o', mfc=None, markersize=3.5, label='WRF')
-    ax.plot(prec2_NamCo.Time, prec2_NamCo, lw=1.4, c='g', marker='o', mfc=None, markersize=3.5, label='WRF-LakeTrunOff')
+    ax.plot(prec2_NamCo.Time, prec2_NamCo, lw=1.4, c='g', marker='o', mfc=None, markersize=3.5, label='WRF-LakeTurnOff')
     ax.plot(trmm_NamCo.TIME, trmm_NamCo, lw=1.4, c='b', marker='o', mfc=None, markersize=3.5, label='TRMM')
     ax.set_title('NamCo Station', loc='left', y=0.9, x=0.02, fontsize=14, weight='bold')
     ax.set_ylabel('Precipitation $\mathrm{mmd^{-1}}$', fontsize=14)
-    ax.legend(fontsize=13, loc='upper right', frameon=False)
-    ax.set_ylim([-1, 30])
+    ax.legend(fontsize=13, loc='upper right', ncol=2, frameon=False)
+    ax.set_ylim([-1, 20])
 
     import matplotlib.dates as mdate    
     ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
 
-    # fig.savefig('fig-test-9.4/TS.jpg', dpi=300)
+    fig.savefig('fig-test-9.4/TS2.jpg', dpi=300)
+    # fig.savefig('TS.eps',dpi=300,format='eps')

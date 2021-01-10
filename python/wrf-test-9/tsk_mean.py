@@ -2,6 +2,7 @@
 from Module import *
 from prec_sum import add_artist, add_NamCo
 import gdal
+import Nio
 
 def load_wrfdata_TSK(data_dir):
     wrf_files = [f for f in os.listdir(data_dir) if f[9]=='2']
@@ -49,17 +50,20 @@ def get_MODIS(modis_file):
     return modis
     
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-9.4'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-9.4-nolake'
+    data_dir1 = '/home/zzhzhao/Model/wrfout/test-9.4-initLSWT'
+    data_dir2 = '/home/zzhzhao/Model/wrfout/test-9.4-initLSWT-laketurnoff'
     tsk1, lats, lons, time = load_wrfdata_TSK(data_dir1)
     tsk2, lats, lons, time = load_wrfdata_TSK(data_dir2)
 
     ### MODIS资料
-    modis_file_day = 'data/MOD_LSTD_M_2017-06-01_rgb_3600x1800.FLOAT.TIFF'
-    modis_file_night = 'data/MOD_LSTN_M_2017-06-01_rgb_3600x1800.FLOAT.TIFF'
-    modis_day = get_MODIS(modis_file_day)
-    modis_night = get_MODIS(modis_file_night)
-    modis = (modis_day + modis_night) / 2
+    modis_file = 'data/MOD11C3.A2017152.006.2017187193442.hdf'
+    ds = xr.open_dataset(modis_file, engine='pynio')
+    modis_day = ds.LST_Day_CMG
+    modis_night = ds.LST_Night_CMG
+    modis = (modis_day + modis_night) / 2. - 273.15
+    
+    modis = xr.DataArray(modis.values, dims=['lat', 'lon'], coords=[np.linspace(90, -90, 3600), np.linspace(-180, 180, 7200)])
+    modis = modis.sel(lat=slice(34, 28), lon=slice(86,94))
 
     ### 平均表面温度
     # tsk = tsk.sel(Time=pd.date_range('2017-6-01 18:00:00', periods=30, freq='1D'))
@@ -68,21 +72,60 @@ if __name__ == '__main__':
 #%%
     ### 表面温度分布
     proj = ccrs.PlateCarree()
-    labels = ['MODIS', 'WRF', 'WRF-LakeTurnOff']
+    labels = ['WRF', 'WRF-LakeTurnOff', 'MODIS', 'Difference']
     fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(10,10), subplot_kw={'projection':proj})
     fig.subplots_adjust(hspace=0.01)
     for i in range(2):
         for j in range(2):
             axes[i, j] = add_artist(axes[i, j], proj)
             axes[i, j] = add_NamCo(axes[i, j])
-    c = axes[0][0].pcolor(modis.lon, modis.lat, modis, vmin=-10, vmax=20, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
-    # c = axes[0][0].pcolor(era5_skt.longitude, era5_skt.latitude, era5_skt, vmin=-10, vmax=20, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
-    axes[0][0].set_title(labels[0], fontsize=14, weight='bold')
     for j, tsk_mean in enumerate([tsk1_mean, tsk2_mean]):
-        c = axes[1][j].pcolor(lons, lats, tsk_mean, vmin=-10, vmax=20, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
+        c = axes[0][j].pcolor(lons, lats, tsk_mean, vmin=-10, vmax=20, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
+        axes[0][j].set_title(labels[j], fontsize=14, weight='bold')
+    axes[1][0].pcolor(modis.lon, modis.lat, modis, vmin=-10, vmax=20, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
+    axes[1][0].set_title(labels[2], fontsize=14, weight='bold')
+    cb = fig.colorbar(c, ax=axes, orientation='horizontal', pad=0.05, shrink=0.9, aspect=35)
+    cb.set_label('Skin temperature / $\mathrm{^\circ C}$', fontsize=14)
+
+    c2 = axes[1][1].pcolor(lons, lats, tsk1_mean-tsk2_mean, vmin=-3, vmax=3, cmap='RdBu_r', transform=proj)
+    axes[1][1].set_title(labels[3], fontsize=14, weight='bold')
+
+    from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+    axins = inset_axes(axes[1][1],
+                width="5%", # width = 10% of parent_bbox width
+                height="100%", # height : 50%
+                loc=6,
+                bbox_to_anchor=(1.05, 0., 1, 1),
+                bbox_transform=axes[1][1].transAxes,
+                borderpad=0,
+            ) 
+    cb2 = fig.colorbar(c2, cax=axins)
+
+    # axes[0][1].set_visible(False)
+
+    fig.savefig('fig-test-9.4/tsk2.jpg', dpi=300)
+
+#%% 
+    t2m = xr.open_dataset('data/t2m_mean.nc')
+    t2m1_mean = t2m.t2m1
+    t2m2_mean = t2m.t2m2
+    lats, lons = t2m.lat, t2m.lon
+
+#%%
+    ### tsk-2m温度分布
+    proj = ccrs.PlateCarree()
+    labels = ['XXX', 'WRF', 'WRF-LakeTurnOff']
+    fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(10,10), subplot_kw={'projection':proj})
+    fig.subplots_adjust(hspace=0.01)
+    for i in range(2):
+        for j in range(2):
+            axes[i, j] = add_artist(axes[i, j], proj)
+            axes[i, j] = add_NamCo(axes[i, j])
+    # c = axes[0][0].pcolor(modis.lon, modis.lat, modis, vmin=-10, vmax=20, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
+    axes[0][0].set_title(labels[0], fontsize=14, weight='bold')
+    for j, diff in enumerate([tsk1_mean-t2m1_mean, tsk2_mean-t2m2_mean]):
+        c = axes[1][j].pcolor(lons, lats, diff, vmin=0, vmax=5, cmap='RdBu_r', transform=proj)
         axes[i][j].set_title(labels[j+1], fontsize=14, weight='bold')
     cb = fig.colorbar(c, ax=axes, orientation='horizontal', pad=0.05, shrink=0.9, aspect=35)
     cb.set_label('Skin temperature / $\mathrm{^\circ C}$', fontsize=14)
     axes[0][1].set_visible(False)
-
-    # fig.savefig('fig-test-9.4/tsk.jpg', dpi=300)

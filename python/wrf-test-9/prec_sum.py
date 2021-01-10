@@ -69,8 +69,8 @@ def load_wrfdata(data_dir):
 
 #%%
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-9.4'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-9.4-nolake'
+    data_dir1 = '/home/zzhzhao/Model/wrfout/test-9.4-initLSWT'
+    data_dir2 = '/home/zzhzhao/Model/wrfout/test-9.4-initLSWT-laketurnoff'
     prec1, lats, lons, time = load_wrfdata(data_dir1)
     prec2, lats, lons, time = load_wrfdata(data_dir2) 
 
@@ -93,22 +93,37 @@ if __name__ == '__main__':
 #%%
     ### 累计降水分布
     proj = ccrs.PlateCarree()
-    crange = np.arange(0, 200+10, 10)
-    labels = ['TRMM', 'WRF', 'WRF-LakeTurnOff']
+    # crange = np.arange(0, 200+10, 10)
+    labels = ['WRF', 'WRF-LakeTurnOff', 'TRMM', 'Difference']
     fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(10,10), subplot_kw={'projection':proj})
     fig.subplots_adjust(hspace=0.01)
     for i in range(2):
         for j in range(2):
             axes[i, j] = add_artist(axes[i, j], proj)
             axes[i, j] = add_NamCo(axes[i, j])
-    c = axes[0][0].pcolor(lon, lat, trmm_sum, vmin=0, vmax=200, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
-    axes[0][0].set_title(labels[0], fontsize=14, weight='bold')
     for j, prec_sum in enumerate([prec1_sum, prec2_sum]):
-        c = axes[1][j].pcolor(lons, lats, prec_sum, vmin=0, vmax=200, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
-        axes[i][j].set_title(labels[j+1], fontsize=14, weight='bold')
+        c = axes[0][j].pcolor(lons, lats, prec_sum, vmin=0, vmax=250, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
+        axes[0][j].set_title(labels[j], fontsize=14, weight='bold')
+    axes[1][0].pcolor(lon, lat, trmm_sum, vmin=0, vmax=250, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
+    axes[1][0].set_title(labels[2], fontsize=14, weight='bold')
+    c2 = axes[1][1].pcolor(lons, lats, prec1_sum-prec2_sum, vmin=-50, vmax=50, cmap='RdBu', transform=proj)
+    axes[1][1].set_title(labels[3], fontsize=14, weight='bold')
     cb = fig.colorbar(c, ax=axes, orientation='horizontal', pad=0.05, shrink=0.9, aspect=35)
     cb.set_label('Precipitation / mm', fontsize=14)
-    axes[0][1].set_visible(False)
+    
+    from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+    axins = inset_axes(axes[1][1],
+                  width="5%", # width = 10% of parent_bbox width
+                  height="100%", # height : 50%
+                  loc=6,
+                  bbox_to_anchor=(1.05, 0., 1, 1),
+                  bbox_transform=axes[1][1].transAxes,
+                  borderpad=0,
+              )
+    
+    cb2 = fig.colorbar(c2, cax=axins)#, orientation='vertical', shrink=0.6, aspect=25)
+    # cb2.set_label('Precipitation / mm', fontsize=14)
+    # axes[0][1].set_visible(False)
 
-    # fig.savefig('fig-test-9.4/prec.jpg', dpi=300)
+    fig.savefig('fig-test-9.4/prec2.jpg', dpi=300)
 

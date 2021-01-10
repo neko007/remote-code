@@ -22,6 +22,7 @@ if __name__ == '__main__':
             del mask.coords['west_east'], mask.coords['south_north']
 
         # 变量的metadata和coords要跟原始一致
+        # 修改LU_INDEX、LANDUSEF、LANDMASK
         lu = ds1['LU_INDEX']
         lu_new = lu.copy()
         lu_new.loc[dict(Time=0)] = xr.where(mask, 10, lu.loc[dict(Time=0)])
@@ -31,7 +32,11 @@ if __name__ == '__main__':
         luf_new.loc[dict(land_cat=20, Time=0)] = xr.where(mask, 0., luf_new.sel(land_cat=20, Time=0))
         luf_new.loc[dict(land_cat=9, Time=0)] = luf_new.sel(land_cat=9, Time=0) + xr.where(mask, luf.sel(land_cat=20, Time=0), 0.)
 
-        del ds1['LU_INDEX'], ds1['LANDUSEF']
-        ds1 = ds1.assign(LU_INDEX=lu_new, LANDUSEF=luf_new) 
+        landmask = ds1['LANDMASK']
+        landmask_new = landmask.copy()
+        landmask_new.loc[dict(Time=0)] = xr.where(mask, 1, landmask.loc[dict(Time=0)])
+
+        del ds1['LU_INDEX'], ds1['LANDUSEF'], ds1['LANDMASK']
+        ds1 = ds1.assign(LU_INDEX=lu_new, LANDUSEF=luf_new, LANDMASK=landmask_new) 
 
         ds1.to_netcdf(geo_file, engine='scipy') # scipy引擎才能输出netcdf3，默认是输出hdf5包装下的netcdf4

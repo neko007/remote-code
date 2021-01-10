@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
 #%%
     # NamCo station
-    NamCo_latlon = (31, 90.7)
+    NamCo_latlon = (30.75, 90.9)
     NamCo_position = nearest_position(NamCo_latlon, lats, lons)
     prec_NamCo = prec.sel(south_north=NamCo_position[0], west_east=NamCo_position[1])
     trmm_NamCo = trmm.sel(LAT=NamCo_latlon[0], LON=NamCo_latlon[1], method='ffill')

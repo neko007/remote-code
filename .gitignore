@@ -11,6 +11,7 @@
 *.TIFF
 *.tif
 shpfiles/
+wrfout_d*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
