@@ -12,6 +12,8 @@
 *.tif
 shpfiles/
 wrfout_d*
+*.hdf
+*.xlsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
