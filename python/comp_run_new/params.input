@@ -1,0 +1,51 @@
+&control
+    core_num = 16
+    model_dir = '/home/zzhzhao/Model'
+    test_number = ''
+\
+
+&drive
+    data_file = '驱动场'
+    sst_file = '海温场'
+    Vtable_type = 'Vtable.GFS'
+    interval_hours = 6 ! 驱动场时间间隔
+    num_metgrid_levels = 32 ! 驱动场层数
+    sst_flag = 0 ! 引入海温场
+
+\
+
+&time
+    simulation_start = 2020, 9, 1, 00 ! 年，月，日，小时的格式
+    simulation_end = 2020, 9, 2, 00
+    run_days = 2
+    run_hours = 0
+    restart = False
+    restart_interval = 1440 ! min
+    history_interval = 60, 60, 60 ! 输出文件时间间隔
+    frames_per_outfile = 6, 6, 100 ! 文件打包个数
+\
+
+&domain
+    max_dom = 1
+    parent_ids = 1, 1
+    parent_grid_ratios = 1, 3
+    lat_mins = 20, 30
+    lat_maxs = 55, 45
+    lon_mins = 80, 105
+    lon_maxs = 145, 125
+    dx = 30000
+    dy = 30000
+
+\
+
+&scheme
+    mp_physics = 3
+    cu_physics = 1
+    ra_lw_physics = 1
+    ra_sw_physics = 1
+    bl_pbl_physics = 1
+    sf_sfclay_physics = 1
+    sf_surface_physics = 2
+    chem = 0
+    sf_lake_physics = 1
+\
