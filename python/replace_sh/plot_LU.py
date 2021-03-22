@@ -1,6 +1,6 @@
 #%%
 import sys
-sys.path.append('/home/zzhzhao/code/python/replaceLU_sh')
+sys.path.append('/home/zzhzhao/code/python/replace_sh')
 from Module import *
 import salem
 

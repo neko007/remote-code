@@ -14,6 +14,7 @@ shpfiles/
 wrfout_d*
 *.hdf
 *.xlsx
+wrfinput_d*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

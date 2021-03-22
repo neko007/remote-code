@@ -1,6 +1,9 @@
 import os
 import f90nml 
 
+# 运行设置
+core_num = 16
+
 # 基本路径
 model_dir = '/home/zzhzhao/Model'
 test_number = ''
@@ -65,6 +68,10 @@ sst_flag = 0
 
 # lake
 sf_lake_physics = 1
+# 用WRF默认程式替代湖温
+alternative_lswt = 1
+# 用相邻下垫面替换湖泊
+alternative_lake = 1
 
 # chem
 chem = 0
@@ -89,8 +96,9 @@ sf_surface_physics = 2
 wps_nml_name = 'namelist.wps'
 wrf_nml_name = 'namelist.input'
 tests_dir = os.path.join(model_dir, 'tests')
-wps_dir = os.path.join(tests_dir, test_number, 'WPS')
-wrf_dir = os.path.join(tests_dir, test_number, 'WRF')
+root_dir =  os.path.join(tests_dir, test_number)
+wps_dir = os.path.join(root_dir, 'WPS')
+wrf_dir = os.path.join(root_dir, 'WRF')
 data_dir = '../data' # 驱动场资料路径
 geog_data_path = os.path.join(model_dir, 'Build_WRF/WPS_GEOG') # 静态地形资料的路径
 
@@ -156,7 +164,7 @@ stand_lon = ref_lon
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-def modify_wps_nml(sst_update):
+def modify_wps_nml():
     '''
     读取并修改namelist.wps
     '''
@@ -184,13 +192,15 @@ def modify_wps_nml(sst_update):
     nml_wps['geogrid']['geog_data_res'] = [geog_data_res] * max_dom
 
     nml_wps['ungrib']['prefix'] = prefix
-    if sst_update == 1:
+    if sst_flag == 1:
         nml_wps['ungrib']['prefix'] = 'SST'
         nml_wps['metgrid']['fg_name'] = ['FILE', 'SST']
+    if alternative_lswt == 1:
+        nml_wps['metgrid']['constants_name'] = 'TAVGSFC'
     
     return nml_wps
     
-def modify_wrf_nml(sst_update):
+def modify_wrf_nml():
     '''
     读取并修改namelist.input 
     '''
@@ -238,7 +248,7 @@ def modify_wrf_nml(sst_update):
     nml_wrf['physics']['sf_sfclay_physics'] = [sf_sfclay_physics] * max_dom
     nml_wrf['physics']['sf_surface_physics'] = [sf_surface_physics] * max_dom
 
-    if sst_update == 1:
+    if sst_flag == 1:
         nml_wrf['time_control'].update({'auxinput4_inname':'wrflowinp_d<domain>', 'auxinput4_interval':360, 'io_form_auxinput4':2})
         nml_wrf['physics'].update({'sst_update':sst_update})
     

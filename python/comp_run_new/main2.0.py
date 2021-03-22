@@ -8,11 +8,11 @@ import numpy as np
 from modify_nml2 import *
 
 # 打印基本信息
-def describe(test_number):
+def describe():
     print(f'**** {test_number} start ****')
 
 # 编译运行wps
-def run_wps(sst_flag):
+def run_wps():
     # 配置编译
     # print('>>>> configure wps <<<<')
     # sp.call('echo 17 | ./configure > log.configure', shell=True)
@@ -20,40 +20,33 @@ def run_wps(sst_flag):
     # sp.run('./compile >& log.compile', shell=True)
     
     # 修改namelist.wps
-    nml_wps = modify_wps_nml(0)
+    nml_wps = modify_wps_nml()
     # 复写 namelist.wps
     rewrite_namelist(wps_dir, wps_nml_name, nml_wps, 1)
     # geogrid 地形插值
     print('>>>> geogrid.exe <<<<')
     sp.run('./geogrid.exe >& geogrid.log', shell=True)
+    # 替换湖泊为相邻下垫面
+    remove_lake(alternative_lake)
     # 链接数据
     print('>>>> link data <<<<')
-    sp.run('ln -sf ungrib/Variable_Tables/{Vtable_type} Vtable', shell=True)
+    sp.run(f'ln -sf ungrib/Variable_Tables/{Vtable_type} Vtable', shell=True)
     sp.run('./link_grib.csh ' + os.path.join(data_dir, data_file), shell=True)
     # ungrid 解码
     print('>>>> ungrib.exe <<<<')
     sp.run('./ungrib.exe >& ungrib.log', shell=True)
-    if sst_flag == 1:
-        # 链接海温场
-        print('>>>> prepare SST data <<<<')
-        sp.run('ln -sf ungrib/Variable_Tables/Vtable.SST Vtable', shell=True)
-        sp.run('./link_grib.csh ' + os.path.join(data_dir, sst_file), shell=True)
-        # 修改namelist.wps
-        nml_wps = modify_wps_nml(1)
-        # 复写 namelist.wps
-        rewrite_namelist(wps_dir, wps_nml_name, nml_wps, 1)
-        # ungrid 解码
-        print('>>>> ungrib.exe <<<<')
-        sp.run('./ungrib.exe >& ungrib.log', shell=True)
+    # 更新海温场
+    sst_update(sst_flag)
+    # 初始湖温替换
+    alter_lswt(alternative_lswt)
     # metgrid 气象场插值
     print('>>>> metgrid.exe <<<<')
     sp.run('./metgrid.exe > metgrid.log', shell=True)
 
-
 # 运行WRF
-def run_wrf(sst_flag):
+def run_wrf():
     # 修改namelist.input
-    nml_wrf = modify_wrf_nml(sst_flag)
+    nml_wrf = modify_wrf_nml()
     # 复写namelist.input
     rewrite_namelist(os.path.join(wrf_dir, 'run'), wrf_nml_name, nml_wrf, 2)
     # 链接气象场    
@@ -83,12 +76,51 @@ def rewrite_namelist(target_dir, nml_name, nml, flag):
     print('>>>> rewrite namelist.wps <<<<')
     nml.write(nml_name)
 
+def sst_update(sst_flag):
+    '''
+    用额外的海温场更新初始/边界条件
+    '''
+    if sst_flag == 1:
+        # 链接海温场
+        print('>>>> prepare SST data <<<<')
+        sp.run('ln -sf ungrib/Variable_Tables/Vtable.SST Vtable', shell=True)
+        sp.run('./link_grib.csh ' + os.path.join(data_dir, sst_file), shell=True)
+        # 修改namelist.wps
+        nml_wps = modify_wps_nml()
+        # 复写 namelist.wps
+        rewrite_namelist(wps_dir, wps_nml_name, nml_wps, 1)
+        # ungrid 解码
+        print('>>>> ungrib.exe <<<<')
+        sp.run('./ungrib.exe >& ungrib.log', shell=True)
+    else:
+        return 0
+
+def alter_lswt(alternative_lswt):
+    '''
+    用WRF默认程式替换初始场湖温（WRFUsersGuide 3-28）
+    '''
+    if alternative_lswt == 1:
+        print('>>>> cal avg_tsfc <<<<')
+        sp.run('./util/avg_tsfc.exe > avg_tsfc.out', shell=True)
+    else:
+        return 0
+
+def remove_lake(alternative_lake):
+    '''
+    用自己编写的脚本将湖泊（纳木错）替换为相邻土地利用类型
+    '''
+    if alternative_lake == 1:
+        print('>>>> remove lake <<<<')
+        sp.run('python ./remove_lake.py', shell=True)
+    else:
+        return 0
+
 if __name__ == '__main__':
     # 打印基本信息
-    describe(test_number)
+    describe()
 
     # 运行WPS
-    run_wps(sst_flag)
+    run_wps()
 
     # 运行WRF
-    run_wrf(sst_flag)
+    run_wrf()
