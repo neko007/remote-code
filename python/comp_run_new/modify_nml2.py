@@ -69,12 +69,11 @@ dy = 30000
 # 引入海温场
 sst_flag = 0
 
-# lake
-sf_lake_physics  = 1
-# 用WRF默认程式替代湖温
-alternative_lswt = 1
-# 用相邻下垫面替换湖泊
-alternative_lake = 1
+### lake
+sf_lake_physics  = 1 # WRF-Lake开关
+alternative_lswt = 1 # 用WRF默认程式替代湖温
+alternative_lake = 1 # 用相邻下垫面替换湖泊
+md_lakedepth     = 1 # 替换湖泊深度（一般与alternative_lake相反）
 
 # chem
 chem = 0
@@ -272,7 +271,7 @@ def modify_wrf_nml():
         nml_wrf['physics'].update({'sf_lake_physics':[1] * max_dom})
         nml_wrf['physics'].update({'lakedepth_default':[50] * max_dom})
         nml_wrf['physics'].update({'lake_min_elev':[5] * max_dom})
-        nml_wrf['physics'].update({'use_lakedepth':[1] * max_dom})
+        nml_wrf['physics'].update({'use_lakedepth':[0] * max_dom})
 
     ### chem
     if chem == 1:

@@ -28,6 +28,8 @@ def run_wps():
     sp.run('./geogrid.exe >& geogrid.log', shell=True)
     # 替换湖泊为相邻下垫面
     remove_lake(alternative_lake)
+    # 替换湖泊深度 
+
     # 链接数据
     print('>>>> link data <<<<')
     sp.run(f'ln -sf ungrib/Variable_Tables/{Vtable_type} Vtable', shell=True)
@@ -116,6 +118,19 @@ def remove_lake(alternative_lake):
         sp.run('python ./remove_lake.py', shell=True)
     else:
         return 0
+
+def modify_lakedepth(md_lakedepth, alternative_lake):
+    '''
+    用观测湖盆深度替换默认的NamCo湖深
+    '''
+    if alternative_lake == 1:
+        print('>>>> no need for modifing lakedepth')
+    elif md_lakedepth == 1:
+        print('>>>> modify lakedepth <<<<')
+        sp.run('python ./lakedepth.py', shell=True)
+    else:
+        return 0
+
 
 def copy_iofiles():
     '''
