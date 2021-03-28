@@ -47,6 +47,8 @@ def run_wps():
 def run_wrf():
     # 修改namelist.input
     nml_wrf = modify_wrf_nml()
+    # 复制iofield文件到WRF/run
+    copy_iofiles()
     # 复写namelist.input
     rewrite_namelist(os.path.join(wrf_dir, 'run'), wrf_nml_name, nml_wrf, 2)
     # 链接气象场    
@@ -114,6 +116,16 @@ def remove_lake(alternative_lake):
         sp.run('python ./remove_lake.py', shell=True)
     else:
         return 0
+
+def copy_iofiles():
+    '''
+    拷贝自定义输入输出文件到WRF/run目录下
+    '''
+    file_path1 = os.path.join(root_path, 'comp_run_new', f'{iofile_name}_d0x.txt')
+    for i in range(max_dom):
+        file_path2 = os.path.join(wrf_dir, 'run', f'{iofile_name}_d0{i+1}.txt')
+        sp.run(f'cp {file_path1} {file_path2}', shell=True)
+        print(f'>>>> copy {iofile_name}_d0{i+1}.txt complete <<<<')
 
 if __name__ == '__main__':
     # 打印基本信息
