@@ -254,7 +254,7 @@ def modify_wrf_nml(sst_update):
         nml_wrf['physics'].update({'sf_lake_physics':[1] * max_dom})
         nml_wrf['physics'].update({'lakedepth_default':[50] * max_dom})
         nml_wrf['physics'].update({'lake_min_elev':[5] * max_dom})
-        nml_wrf['physics'].update({'use_lakedepth':[1] * max_dom})
+        nml_wrf['physics'].update({'use_lakedepth':[0] * max_dom})
 
     # chem
     if chem == 1:

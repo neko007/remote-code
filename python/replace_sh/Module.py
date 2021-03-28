@@ -62,28 +62,32 @@ def set_grid(ax, lat=[29,32.5], lon=[87,93]):
     ----------
     lat, lon: 经纬度范围
     '''
-    from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
     from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
-    from matplotlib.ticker import MultipleLocator, FormatStrFormatter,AutoMinorLocator
+    import geopandas
 
-    # 限定区域
+    ### 限定区域
     extent = [np.min(lon), np.max(lon), np.min(lat), np.max(lat)]
     ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-    lat_span = .5 # 经纬度间隔
-    lon_span = .5
+    lat_span = 5 # 经纬度间隔
+    lon_span = 5
     ax.set_xticks(np.arange(lon[0], lon[1]+lon_span, lon_span))
     ax.set_yticks(np.arange(lat[0], lat[1]+lat_span, lat_span))
     ax.tick_params(top=True,bottom=True,left=True,right=True)
 
-    # 取消坐标单位度°的小圆点
+    ### 取消坐标单位度°的小圆点
     lon_formatter = LongitudeFormatter(degree_symbol='')
     lat_formatter = LatitudeFormatter(degree_symbol='')
     ax.xaxis.set_major_formatter(lon_formatter)
     ax.yaxis.set_major_formatter(lat_formatter)
     ax.tick_params(axis='both',labelsize=12, direction='out')
 
-    # 国界线
+    ### 国界线
     linewidth = 0.8
-    ax.add_feature(cfeature.BORDERS.with_scale('10m'), lw=linewidth)
-    ax.coastlines(resolution='10m', lw=linewidth)
+    # ax.add_feature(cfeature.BORDERS.with_scale('10m'), lw=linewidth) # 藏南被吃了，慎用
+    f_in = '/home/zzhzhao/code/shpfiles/boundary/border/国界线.shp'
+    shp = geopandas.read_file(f_in, encoding='gbk')
+    ax.add_geometries(shp.geometry, crs=ccrs.PlateCarree(), edgecolor='k', alpha=0.4, facecolor='none', lw=0.6)
+    
+    ### 海岸线
+    ax.coastlines(resolution='10m', lw=linewidth) 
