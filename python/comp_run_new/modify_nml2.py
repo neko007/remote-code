@@ -227,7 +227,7 @@ def modify_wrf_nml():
     nml_wrf['time_control']['end_hour']           = [h_end for i in range(max_dom)]
     nml_wrf['time_control']['interval_seconds']   = interval_seconds
     nml_wrf['time_control']['history_interval']   = [history_interval] * max_dom
-    nml_wrf['time_control']['frames_per_outfile'] = [frames_per_outfile] * max
+    nml_wrf['time_control']['frames_per_outfile'] = [frames_per_outfile] * max_dom
     nml_wrf['time_control']['restart']            = restart
     nml_wrf['time_control']['restart_interval']   = restart_interval
     # nml_wrf['time_control'].update({'history_outname':os.path.join(wrfout_path, wrfout_file)})
