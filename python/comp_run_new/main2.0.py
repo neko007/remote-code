@@ -13,12 +13,6 @@ def describe():
 
 # 编译运行wps
 def run_wps():
-    # 配置编译
-    # print('>>>> configure wps <<<<')
-    # sp.call('echo 17 | ./configure > log.configure', shell=True)
-    # print('>>>> compile wps <<<<')
-    # sp.run('./compile >& log.compile', shell=True)
-    
     # 修改namelist.wps
     nml_wps = modify_wps_nml()
     # 复写 namelist.wps
@@ -29,7 +23,7 @@ def run_wps():
     # 替换湖泊为相邻下垫面
     remove_lake(alternative_lake)
     # 替换湖泊深度 
-
+    modify_lakedepth(md_lakedepth, alternative_lake)
     # 链接数据
     print('>>>> link data <<<<')
     sp.run(f'ln -sf ungrib/Variable_Tables/{Vtable_type} Vtable', shell=True)
@@ -124,7 +118,7 @@ def modify_lakedepth(md_lakedepth, alternative_lake):
     用观测湖盆深度替换默认的NamCo湖深
     '''
     if alternative_lake == 1:
-        print('>>>> no need for modifing lakedepth')
+        print('*** Warning: no need for modifing lakedepth ***')
     elif md_lakedepth == 1:
         print('>>>> modify lakedepth <<<<')
         sp.run('python ./lakedepth.py', shell=True)
@@ -136,10 +130,10 @@ def copy_iofiles():
     '''
     拷贝自定义输入输出文件到WRF/run目录下
     '''
-    file_path1 = os.path.join(root_dir, 'comp_run_new', f'{iofile_name}_d0x.txt')
+    source_path = os.path.join(root_dir, 'comp_run_new', f'{iofile_name}_d0x.txt')
     for i in range(max_dom):
-        file_path2 = os.path.join(wrf_dir, 'run', f'{iofile_name}_d0{i+1}.txt')
-        sp.run(f'cp {file_path1} {file_path2}', shell=True)
+        target_path = os.path.join(wrf_dir, 'run', f'{iofile_name}_d0{i+1}.txt')
+        sp.run(f'cp {source_path} {target_path}', shell=True)
         print(f'>>>> copy {iofile_name}_d0{i+1}.txt complete <<<<')
 
 if __name__ == '__main__':

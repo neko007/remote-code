@@ -1,16 +1,19 @@
 import os
 import f90nml 
 
-# 运行设置
-core_num = 16
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# 需要经常修改的部分
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-# 基本路径
-model_dir   = '/home/zzhzhao/Model'
+# 核数设置
+core_num = 10
+
+# 测试路径
 test_number = '（记得修改）'
 
 # 驱动场资料名称
 data_file = '驱动场（记得修改）'
-sst_file  = '海温场'
+sst_file  = '海温场' # 有则修改
 
 # 驱动场资料类型
 Vtable_type = 'Vtable.GFS'
@@ -97,10 +100,11 @@ sf_surface_physics = 2
 # 路径
 wps_nml_name   = 'namelist.wps'
 wrf_nml_name   = 'namelist.input'
+model_dir   = '/home/zzhzhao/Model'
 tests_dir      = os.path.join(model_dir, 'tests')
 root_dir       = os.path.join(tests_dir, test_number)
 wps_dir        = os.path.join(root_dir, 'WPS')
-wrf_dir        = os.path.join(root_dir, 'WRF')
+wrf_dir        = os.path.join(root_dir, 'WRFV3') # 针对WRF3.9.1进行修改
 data_dir       = '../data' # 驱动场资料路径
 geog_data_path = os.path.join(model_dir, 'Build_WRF/WPS_GEOG') # 静态地形资料的路径
 
@@ -272,6 +276,9 @@ def modify_wrf_nml():
         nml_wrf['physics'].update({'lakedepth_default':[50] * max_dom})
         nml_wrf['physics'].update({'lake_min_elev':[5] * max_dom})
         nml_wrf['physics'].update({'use_lakedepth':[0] * max_dom})
+
+    ### 运行WRF3.9.1版本需要添加的地方，否则会在./wrf.exe时报错
+    nml_wrf['dynamics'].update({'max_rot_angle_gwd':100})
 
     ### chem
     if chem == 1:
