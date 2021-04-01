@@ -2,6 +2,7 @@ import xarray as xr
 import xesmf
 import salem 
 import geopandas
+import os 
 from modify_nml2 import max_dom, wps_dir
 
 def load_NamCo_shp():
@@ -28,8 +29,8 @@ if __name__ == '__main__':
     data_dir = wps_dir
     for i in range(max_dom):
         geo_file = f'geo_em.d0{i+1}.nc'
-        with xr.open_dataset(data_dir+geo_file) as ds1:
-            with salem.open_xr_dataset(data_dir+geo_file) as ds2:
+        with xr.open_dataset(os.path.join(data_dir, geo_file)) as ds1:
+            with salem.open_xr_dataset(os.path.join(data_dir, geo_file)) as ds2:
                 lakedepth = ds2['LAKE_DEPTH']
                 lakedepth_NamCo = lakedepth.salem.roi(shape=load_NamCo_shp()).isel(Time=0)
                 mask = lakedepth_NamCo.notnull()
@@ -53,7 +54,7 @@ if __name__ == '__main__':
                 del ds1['LAKE_DEPTH']
                 ds1 = ds1.assign(LAKE_DEPTH=lakedepth_new)
 
-                if os.path.exists(f'{data_dir}/{geo_file}'):
-                    print(f'**** delete {geo_file} ****')
+                if os.path.exists(os.path.join(data_dir, geo_file)):
+                    print(f'  **** delete {geo_file} ****')
                 ds1.to_netcdf(f'{data_dir}/{geo_file}', engine='scipy') # scipy引擎才能输出netcdf3，默认是输出hdf5包装下的netcdf4
                 print(f'  **** rewrite {geo_file} ****')

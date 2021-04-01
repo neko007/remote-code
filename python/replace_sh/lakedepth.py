@@ -52,3 +52,5 @@ if __name__ == '__main__':
             del ds1['LAKE_DEPTH']
             ds1 = ds1.assign(LAKE_DEPTH=lakedepth_new)
             ds1.to_netcdf(f'/home/zzhzhao/code/python/replace_sh/{geo_file}', engine='scipy') 
+
+            print('** OK **')

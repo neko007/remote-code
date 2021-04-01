@@ -100,7 +100,8 @@ sf_surface_physics = 2
 # 路径
 wps_nml_name   = 'namelist.wps'
 wrf_nml_name   = 'namelist.input'
-model_dir   = '/home/zzhzhao/Model'
+model_dir      = '/home/zzhzhao/Model'
+comp_run_dir   = os.path.join(model_dir, 'comp_run_new')
 tests_dir      = os.path.join(model_dir, 'tests')
 root_dir       = os.path.join(tests_dir, test_number)
 wps_dir        = os.path.join(root_dir, 'WPS')

@@ -109,7 +109,7 @@ def remove_lake(alternative_lake):
     '''
     if alternative_lake == 1:
         print('>>>> remove lake <<<<')
-        sp.run('python ./remove_lake.py', shell=True)
+        sp.run(f'python {comp_run_dir}/remove_lake.py', shell=True)
     else:
         return 0
 
@@ -121,7 +121,7 @@ def modify_lakedepth(md_lakedepth, alternative_lake):
         print('*** Warning: no need for modifing lakedepth ***')
     elif md_lakedepth == 1:
         print('>>>> modify lakedepth <<<<')
-        sp.run('python ./lakedepth.py', shell=True)
+        sp.run(f'python {comp_run_dir}/lakedepth.py', shell=True)
     else:
         return 0
 

@@ -46,6 +46,6 @@ if __name__ == '__main__':
             ds1 = ds1.assign(LU_INDEX=lu_new, LANDUSEF=luf_new, LANDMASK=landmask_new) 
             
             if os.path.exists(f'{data_dir}/{geo_file}'):
-                print(f'**** delete {geo_file} ****')
+                print(f'  **** delete {geo_file} ****')
             ds1.to_netcdf(f'{data_dir}/{geo_file}', engine='scipy') # scipy引擎才能输出netcdf3，默认是输出hdf5包装下的netcdf4
             print(f'  **** rewrite {geo_file} ****')
