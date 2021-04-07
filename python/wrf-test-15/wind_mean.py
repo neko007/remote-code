@@ -8,14 +8,12 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cmaps
 import os 
-import sys
-sys.path.append('/home/zzhzhao/code/python/wrf-test-10')
 from zMap import set_grid, add_NamCo
 import warnings
 warnings.filterwarnings("ignore")
 
 def load_wrfdata(data_dir):
-    wrf_files = [f for f in os.listdir(data_dir) if f[9]=='2']
+    wrf_files = [f for f in os.listdir(data_dir) if f[11]=='2']
     wrf_list = [Dataset(os.path.join(data_dir, wrf_file)) for wrf_file in wrf_files] 
 
 
@@ -36,11 +34,12 @@ def add_terrain(ax, geo_path):
     # p = ax.pcolor(lons, lats, hgt, vmin=3000, vmax=7000, transform=ccrs.PlateCarree(), cmap='terrain')
     p = ax.contourf(lons, lats, hgt, levels=crange, extend='both', transform=ccrs.PlateCarree(), cmap='terrain')
 
-#%%  
+ 
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-10'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-10-removelake'
-    geo_path = '/home/zzhzhao/Model/tests/test-10/WPS/geo_em.d02.nc'
+    test_number = 15
+    data_dir1 = f'/home/zzhzhao/Model/wrfout/test-{test_number}'
+    data_dir2 = f'/home/zzhzhao/Model/wrfout/test-{test_number}-nolake'
+    geo_path = f'/home/zzhzhao/Model/tests/test-{test_number}/WPS/geo_em.d02.nc'
     u101, v101, lats, lons = load_wrfdata(data_dir1)
     u102, v102, _, _ = load_wrfdata(data_dir2)
 
@@ -77,5 +76,5 @@ if __name__ == '__main__':
 
     axes[1][1].set_visible(False)
     
-    fig.savefig('/home/zzhzhao/code/python/wrf-test-10/fig/wind.jpg', dpi=300)
+    fig.savefig(f'/home/zzhzhao/code/python/wrf-test-{test_number}/fig/wind.jpg', dpi=300)
         

@@ -39,8 +39,8 @@ history_interval   = 1440
 frames_per_outfile = 1
 
 # 辅助文件输出时间间隔(min)、文件打包个数
-auxhist2_interval   = 60
-frames_per_auxhist2 = 24
+auxhist2_interval   = 180
+frames_per_auxhist2 = 8
 
 # 嵌套区域相关配置
 max_dom            = 1
@@ -98,14 +98,15 @@ sf_surface_physics = 2
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 # 路径
+WRF_version    = 'WRFV3'
 wps_nml_name   = 'namelist.wps'
 wrf_nml_name   = 'namelist.input'
 model_dir      = '/home/zzhzhao/Model'
-comp_run_dir   = os.path.join(model_dir, 'comp_run_new')
 tests_dir      = os.path.join(model_dir, 'tests')
 root_dir       = os.path.join(tests_dir, test_number)
+comp_run_dir   = os.path.join(root_dir, 'comp_run_new')
 wps_dir        = os.path.join(root_dir, 'WPS')
-wrf_dir        = os.path.join(root_dir, 'WRFV3') # 针对WRF3.9.1进行修改
+wrf_dir        = os.path.join(root_dir, WRF_version) # 针对WRF3.9.1进行修改
 data_dir       = '../data' # 驱动场资料路径
 geog_data_path = os.path.join(model_dir, 'Build_WRF/WPS_GEOG') # 静态地形资料的路径
 
@@ -279,7 +280,8 @@ def modify_wrf_nml():
         nml_wrf['physics'].update({'use_lakedepth':[0] * max_dom})
 
     ### 运行WRF3.9.1版本需要添加的地方，否则会在./wrf.exe时报错
-    nml_wrf['dynamics'].update({'max_rot_angle_gwd':100})
+    if WRF_version == 'WRFV3':
+        nml_wrf['dynamics'].update({'max_rot_angle_gwd':100})
 
     ### chem
     if chem == 1:

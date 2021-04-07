@@ -3,8 +3,9 @@ from Module import *
 from prec_sum import add_artist, add_NamCo, nearest_position, load_wrfdata
 
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-9.4-initLSWT'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-9.4-initLSWT-laketurnoff'
+    test_number = 10
+    data_dir1 = f'/home/zzhzhao/Model/wrfout/test-{test_number}'
+    data_dir2 = f'/home/zzhzhao/Model/wrfout/test-{test_number}-removelake'
     prec1, lats, lons, time = load_wrfdata(data_dir1)
     prec2, lats, lons, time = load_wrfdata(data_dir2) 
 
