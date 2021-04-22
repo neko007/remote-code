@@ -38,8 +38,10 @@ def add_terrain(ax, geo_path):
 
 #%%  
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-14'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake'
+    # data_dir1 = '/home/zzhzhao/Model/wrfout/test-14'
+    # data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake'
+    data_dir1 = '/home/zzhzhao/Model/wrfout/test-14-oriLD'
+    data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake-oriLD'
     geo_path = '/home/zzhzhao/Model/tests/test-14/WPS/geo_em.d02.nc'
     u101, v101, lats, lons = load_wrfdata(data_dir1)
     u102, v102, _, _ = load_wrfdata(data_dir2)
@@ -77,5 +79,5 @@ if __name__ == '__main__':
 
     axes[1][1].set_visible(False)
     
-    fig.savefig('/home/zzhzhao/code/python/wrf-test-14/fig/wind.jpg', dpi=300)
+    fig.savefig('/home/zzhzhao/code/python/wrf-test-14/fig/wind_oriLD.jpg', dpi=300)
         

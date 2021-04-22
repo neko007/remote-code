@@ -32,8 +32,10 @@ def load_wrfdata(data_dir):
 
 #%%
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-14'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake'
+    # data_dir1 = '/home/zzhzhao/Model/wrfout/test-14'
+    # data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake'
+    data_dir1 = '/home/zzhzhao/Model/wrfout/test-14-oriLD'
+    data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake-oriLD'
     prec1, lats, lons, time = load_wrfdata(data_dir1)
     prec2, lats, lons, time = load_wrfdata(data_dir2) 
 
@@ -88,5 +90,5 @@ if __name__ == '__main__':
     # cb2.set_label('Precipitation / mm', fontsize=14)
     # axes[0][1].set_visible(False)
 
-    fig.savefig('/home/zzhzhao/code/python/wrf-test-14/fig/prec.jpg', dpi=300)
+    fig.savefig('/home/zzhzhao/code/python/wrf-test-14/fig/prec_oriLD.jpg', dpi=300)
 

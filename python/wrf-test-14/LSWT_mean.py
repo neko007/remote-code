@@ -67,8 +67,10 @@ def load_modis(file_path):
     return modis_lake_mean
 
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-14'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake'
+    # data_dir1 = '/home/zzhzhao/Model/wrfout/test-14'
+    # data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake'
+    data_dir1 = '/home/zzhzhao/Model/wrfout/test-14-oriLD'
+    data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake-oriLD'
     tsk1, lats, lons, time = load_wrfdata(data_dir1)
     tsk2, lats, lons, time = load_wrfdata(data_dir2) 
 
@@ -77,7 +79,7 @@ if __name__ == '__main__':
     tsk1_lake_mean = tsk1_lake.mean(dim=['west_east','south_north'])
     tsk2_lake = tsk2.where(mask, drop=True) # 切出NamCo范围
     tsk2_lake_mean = tsk2_lake.mean(dim=['west_east','south_north'])
-#%%
+
     ### MODIS
     file_path = "/home/Public_Data/MODIS/MOD11A1/MOD11A1_NamCo_2017.nc"
     modis_lake_mean = load_modis(file_path)
@@ -88,7 +90,7 @@ if __name__ == '__main__':
     tsk2_lake_daily = tsk2_lake_mean.sel(Time=tsk2_lake_mean.Time.dt.hour.isin(hour_list)).resample(Time='D').mean()
 
     ### 取3 UTC
-    # hour_list = [3]
+    # hour_list = [6]
     # tsk1_lake_daily = tsk1_lake_mean.sel(Time=tsk1_lake_mean.Time.dt.hour.isin(hour_list))
     # tsk2_lake_daily = tsk2_lake_mean.sel(Time=tsk2_lake_mean.Time.dt.hour.isin(hour_list))
 
@@ -102,5 +104,5 @@ if __name__ == '__main__':
     import matplotlib.dates as mdate    
     ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
     
-    fig.savefig('/home/zzhzhao/code/python/wrf-test-14/fig/lswt.jpg', dpi=300, bbox_inches='tight', pad_inches=0.1)
+    fig.savefig('/home/zzhzhao/code/python/wrf-test-14/fig/lswt_oriLD.jpg', dpi=300, bbox_inches='tight', pad_inches=0.1)
     
