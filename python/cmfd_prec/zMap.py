@@ -68,17 +68,17 @@ def _add_subaxes(ax, rect):
     inset_ax.set_ylim(rect[2:])
     return inset_ax
 
-def add_southsea(ax):
-    '''
-    添加南海子图
-    '''
-    f_in = 'boundary/border/国界线.shp'
-    shp = geopandas.read_file(f_in)
-    shp = shp.to_crs(epsg=4326)
+# def add_southsea(ax):
+#     '''
+#     添加南海子图
+#     '''
+#     f_in = 'boundary/border/国界线.shp'
+#     shp = geopandas.read_file(f_in)
+#     shp = shp.to_crs(epsg=4326)
 
-    southsea_range = [105, 125, 0, 25]
-    inset_ax = _add_subaxes(ax, rect=southsea_range)
-    shp.plot(ax=inset_ax, color='k', lw=0.8)
+#     southsea_range = [105, 125, 0, 25]
+#     inset_ax = _add_subaxes(ax, rect=southsea_range)
+#     shp.plot(ax=inset_ax, color='k', lw=0.8)
 
 def add_NamCo(ax, linewidth=1):
     '''
@@ -90,26 +90,26 @@ def add_NamCo(ax, linewidth=1):
     ax.add_geometries(shp2.geometry, crs=ccrs.PlateCarree(), edgecolor='k',
                       alpha=1, facecolor='none', lw=linewidth)
 
-def add_rivers(ax):
-    '''
-    添加长江、黄河 
-    '''
-    f_in = './boundary/hyd1_4m/hyd1_4l.shp'
-    shp = geopandas.read_file(f_in, encoding='gbk')
-    shp2 = pd.concat([shp[shp['NAME']=='黄河'], shp[shp['NAME']=='长江'],
-                      shp[shp['NAME']=='金沙江'], shp[shp['NAME']=="沱沱河(玛曲)"], shp[shp['NAME']=='通天河']], axis=0)
-    shp2.plot(ax=ax, color='royalblue', lw=0.7)
-    # ax.add_geometries(shp.geometry, crs=ccrs.PlateCarree(), alpha=0.5, edgecolor='b', lw=0.8)
-    return ax
+# def add_rivers(ax):
+#     '''
+#     添加长江、黄河 
+#     '''
+#     f_in = './boundary/hyd1_4m/hyd1_4l.shp'
+#     shp = geopandas.read_file(f_in, encoding='gbk')
+#     shp2 = pd.concat([shp[shp['NAME']=='黄河'], shp[shp['NAME']=='长江'],
+#                       shp[shp['NAME']=='金沙江'], shp[shp['NAME']=="沱沱河(玛曲)"], shp[shp['NAME']=='通天河']], axis=0)
+#     shp2.plot(ax=ax, color='royalblue', lw=0.7)
+#     # ax.add_geometries(shp.geometry, crs=ccrs.PlateCarree(), alpha=0.5, edgecolor='b', lw=0.8)
+#     return ax
 
-def add_province(ax):
-    '''
-    添加省界
-    '''
-    f_in = './boundary/province/Province_9.shp'
-    shp = geopandas.read_file(f_in)
-    ax.add_geometries(shp.geometry, crs=ccrs.PlateCarree(), edgecolor='k', alpha=0.4, facecolor='none', lw=0.6)
-    return ax
+# def add_province(ax):
+#     '''
+#     添加省界
+#     '''
+#     f_in = './boundary/province/Province_9.shp'
+#     shp = geopandas.read_file(f_in)
+#     ax.add_geometries(shp.geometry, crs=ccrs.PlateCarree(), edgecolor='k', alpha=0.4, facecolor='none', lw=0.6)
+#     return ax
 
 ### 藏南有点问题
 def country_mask(ax, c, res='50m', nations=['China', 'Taiwan'], boundary=True):
@@ -195,11 +195,21 @@ def add_artist(ax, proj, lat=[29,32.5], lon=[87,93]):
     gl.xlabel_style = {'size':12}
     gl.ylabel_style = {'size':12}
 
+def load_TPshp():
+    file_path = "/home/zzhzhao/code/shpfiles/Tibet/Tibet.shp"
+    shp = geopandas.read_file(file_path, encoding='gbk')
+    shp.crs = "EPSG:4326"
+    return shp
+
+def add_TP(ax, linewidth=1):
+    shp = load_TPshp()
+    ax.add_geometries(shp.geometry, crs=ccrs.PlateCarree(), edgecolor='k', facecolor='k', lw=linewidth)
+
 if __name__ == '__main__':
     fig = plt.figure(figsize=(8,8))
     ax = plt.axes(projection=ccrs.PlateCarree())
 
-    ax = add_southsea(ax)
+    # ax = add_southsea(ax)
     ax.set_extent([70, 140, 10, 55])
     ax.gridlines()
     # ax = add_rivers(ax)
@@ -213,5 +223,10 @@ if __name__ == '__main__':
     # c = ax.contourf(lon, lat, z, transform=ccrs.PlateCarree())
     # ax = country_mask(ax, c)
 
-    ax = add_rivers(ax)
-    ax = add_province(ax)
+    # ax = add_rivers(ax)
+    # ax = add_province(ax)
+    file_path = "/home/zzhzhao/code/shpfiles/Tibet/Tibet.shp"
+    shp = geopandas.read_file(file_path, encoding='gbk')
+    # shp.crs = "EPSG:4326"
+    shp = shp.to_crs(epsg=4326)
+    ax.add_geometries(shp.geometry, crs=ccrs.PlateCarree(), edgecolor='k', facecolor='none', lw=1)
