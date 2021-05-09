@@ -73,10 +73,11 @@ dy = 30000
 sst_flag = 0
 
 ### lake
-sf_lake_physics  = 1 # WRF-Lake开关
-alternative_lswt = 1 # 用WRF默认程式替代湖温
-alternative_lake = 1 # 用相邻下垫面替换湖泊
-md_lakedepth     = 1 # 替换湖泊深度（一般与alternative_lake相反）
+sf_lake_physics   = 1 # WRF-Lake开关
+alternative_lswt  = 1 # 用WRF默认程式替代湖温
+alternative_lake  = 1 # 用相邻下垫面替换湖泊
+md_lakedepth      = 1 # 替换湖泊深度（一般与alternative_lake相反）
+md_mountainHeight = 0 # 修改念青唐古拉山高度
 
 # chem
 chem = 0

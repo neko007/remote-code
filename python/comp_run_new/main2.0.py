@@ -24,6 +24,8 @@ def run_wps():
     remove_lake(alternative_lake)
     # 替换湖泊深度 
     modify_lakedepth(md_lakedepth, alternative_lake)
+    # 去除念青唐古拉山
+    modify_mountainHeight(md_mountainHeight)
     # 链接数据
     print('>>>> link data <<<<')
     sp.run(f'ln -sf ungrib/Variable_Tables/{Vtable_type} Vtable', shell=True)
@@ -127,6 +129,16 @@ def modify_lakedepth(md_lakedepth, alternative_lake):
     else:
         return 0
 
+def modify_mountainHeight(md_mountainHeight):
+    '''
+    去除念青唐古拉山
+    '''
+    if md_mountainHeight == 1:
+        print('>>>> modify mountainHeight <<<<')
+        sp.run('conda activate geocat', shell=True)
+        sp.run(f'python {comp_run_dir}/remove_mountain.py', shell=True)
+    else:
+        return 0
 
 def copy_iofiles():
     '''
