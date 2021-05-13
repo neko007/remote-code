@@ -67,44 +67,63 @@ def load_modis(file_path):
 
 #%%
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-17'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-18'
-    # data_dir1 = '/home/zzhzhao/Model/wrfout/test-14-oriLD'
-    # data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake-oriLD'
-    tsk1, lats, lons, time = load_wrfdata(data_dir1)
-    tsk2, lats, lons, time = load_wrfdata(data_dir2) 
+    data_dir = '/home/zzhzhao/Model/wrfout'
+    testname_list = [
+        'modis',
+        'test-14',
+        'test-14-oriLD',
+        'test-15',
+        'test-15-oriLD',
+        'test-17',
+        'test-18',
+        ]
+    N_test = len(testname_list)
 
-    mask = mask_lake(data_dir1, load_NamCo_shp())
-    tsk1_lake = tsk1.where(mask, drop=True) # 切出NamCo范围
-    tsk1_lake_mean = tsk1_lake.mean(dim=['west_east','south_north'])
-    tsk2_lake = tsk2.where(mask, drop=True) # 切出NamCo范围
-    tsk2_lake_mean = tsk2_lake.mean(dim=['west_east','south_north'])
+    tsk_list = dict()
+    tsk_NamCo_daily_list = dict()
+    for testname in testname_list:
+        if testname == 'modis':
+            file_path = "/home/Public_Data/MODIS/MOD11A1/MOD11A1_NamCo_2017.nc"
+            tsk_list[testname] = load_modis(file_path)
+            tsk_NamCo_daily_list[testname] = tsk_list[testname]
+        else:
+            data_path = os.path.join(data_dir, testname)
+            tsk, lats, lons, time = load_wrfdata(data_path)
+            tsk = xr.where(tsk>0, tsk, np.nan)
+            tsk_list[testname] = tsk
 
-    ### MODIS
-    file_path = "/home/Public_Data/MODIS/MOD11A1/MOD11A1_NamCo_2017.nc"
-    modis_lake_mean = load_modis(file_path)
+            mask = mask_lake(data_path, load_NamCo_shp())
+            tsk_NamCo = tsk.where(mask) # 切出NamCo范围
+            tsk_NamCo_mean = tsk_NamCo.mean(dim=['west_east','south_north'])
+            # tsk_NamCo_mean = tsk_NamCo.isel(west_east=74, south_north=39)
+            
 
-    ### 取3 UTC和6 UTC的平均
-    hour_list = [3, 6]
-    tsk1_lake_daily = tsk1_lake_mean.sel(Time=tsk1_lake_mean.Time.dt.hour.isin(hour_list)).resample(Time='D').mean()
-    tsk2_lake_daily = tsk2_lake_mean.sel(Time=tsk2_lake_mean.Time.dt.hour.isin(hour_list)).resample(Time='D').mean()
+            ### 取3 UTC和6 UTC的平均
+            hour_list = [3, 6]
+            tsk_NamCo_daily = tsk_NamCo_mean.sel(Time=tsk_NamCo_mean.Time.dt.hour.isin(hour_list)).resample(Time='D').mean()
+            tsk_NamCo_daily_list[testname] = tsk_NamCo_daily
 
-    ### 取3 UTC
-    # hour_list = [6]
-    # tsk1_lake_daily = tsk1_lake_mean.sel(Time=tsk1_lake_mean.Time.dt.hour.isin(hour_list))
-    # tsk2_lake_daily = tsk2_lake_mean.sel(Time=tsk2_lake_mean.Time.dt.hour.isin(hour_list))
 
-    fig, ax = plt.subplots(dpi=100, figsize=(7,4))
-    tsk1_lake_daily.plot.line('r^', label='Ctrl', ax=ax)
-    tsk2_lake_daily.plot.line('bo', label='noLake', ax=ax)
-    # tsk1_lake_mean.plot.line('r^', label='Ctrl', ax=ax)
-    # tsk2_lake_mean.plot.line('bo', label='noLake', ax=ax)
-    modis_lake_mean.plot.line('g+', label='Modis', ax=ax)
-    ax.legend(frameon=False, ncol=3)
-    ax.set_ylabel('LSWT / K')
-    # ax.grid(alpha=0.5, ls='--')
-    import matplotlib.dates as mdate    
-    ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
-    
-    # fig.savefig('/home/zzhzhao/code/python/wrf-test-14/fig/lswt_oriLD.jpg', dpi=300, bbox_inches='tight', pad_inches=0.1)
+#%%
+    labels = [
+        'Modis',
+        'Wuyang_90m', 
+        'Wuyang_0.5m',
+        'Default_50m', 
+        'Default_0.5m',
+        'Wuyang_50m', 
+        'Wuyang_20m'
+        ]
+    markers = list('P^.sxD+')
+    fig, ax = plt.subplots(dpi=100)
+    for i, testname in enumerate(testname_list):
+        var = tsk_NamCo_daily_list[testname]
+
+        var.plot.line(lw=0, marker=markers[i], mfc='none', label=labels[i], ax=ax)
+        ax.legend(loc=2, bbox_to_anchor=(1.0,1.0), borderaxespad=0, frameon=False)
+        import matplotlib.dates as mdate  
+        ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
+
+    fig.savefig('fig/lwst_alltest.jpg', dpi=300, bbox_inches='tight', pad_inches=0.1)
+
     

@@ -72,11 +72,28 @@ dy = 30000
 # 引入海温场
 sst_flag = 0
 
-### lake
+### lake option
 sf_lake_physics   = 1 # WRF-Lake开关
 alternative_lswt  = 1 # 用WRF默认程式替代湖温
 alternative_lake  = 1 # 用相邻下垫面替换湖泊
-md_lakedepth      = 1 # 替换湖泊深度（一般与alternative_lake相反）
+use_lakedepth     = 1 # 是否使用静态地形数据中的湖深
+md_lakedepth      = 1 # 替换纳木错湖泊深度（一般与alternative_lake相反）
+lakedepth_default = 50. # 默认湖泊深度，use_lakedepth=0时生效
+
+### lake option based on Wuyang (part)
+### WRF_version = 'WRFV3' 时方可生效
+tlake_init_flag      = True
+tlake_init_value     = 276.05
+eta_flag             = True
+eta_scale_yw         = 0.6
+eta_yw               = 0.1
+diffusivity_flag     = True
+diffusivity_index_yw = 1
+tdmax                = 274.2
+mixing_factor        = 40
+mixing_factor_ked    = 40
+
+### mountain
 md_mountainHeight = 0 # 修改念青唐古拉山高度
 
 # chem
@@ -276,9 +293,20 @@ def modify_wrf_nml():
     ### lake
     if sf_lake_physics == 1:
         nml_wrf['physics'].update({'sf_lake_physics':[1] * max_dom})
-        nml_wrf['physics'].update({'lakedepth_default':[50] * max_dom})
+        nml_wrf['physics'].update({'lakedepth_default':[lakedepth_default] * max_dom})
         nml_wrf['physics'].update({'lake_min_elev':[5] * max_dom})
-        nml_wrf['physics'].update({'use_lakedepth':[0] * max_dom})
+        nml_wrf['physics'].update({'use_lakedepth':[use_lakedepth] * max_dom})
+        if WRF_version == 'WRFV3': # 仅在WRF3.9.1中生效
+            nml_wrf['physics'].update({'tlake_init_flag':[tlake_init_flag] * max_dom})
+            nml_wrf['physics'].update({'tlake_init_value':[tlake_init_value] * max_dom})
+            nml_wrf['physics'].update({'eta_flag':[eta_flag] * max_dom})
+            nml_wrf['physics'].update({'eta_scale_yw':[eta_scale_yw] * max_dom})
+            nml_wrf['physics'].update({'eta_yw':[eta_yw] * max_dom})
+            nml_wrf['physics'].update({'diffusivity_flag':[diffusivity_flag] * max_dom})
+            nml_wrf['physics'].update({'diffusivity_index_yw':[diffusivity_index_yw] * max_dom})
+            nml_wrf['physics'].update({'tdmax':[tdmax] * max_dom})
+            nml_wrf['physics'].update({'mixing_factor':[mixing_factor] * max_dom})
+            nml_wrf['physics'].update({'mixing_factor_ked':[mixing_factor_ked] * max_dom})
 
     ### 运行WRF3.9.1版本需要添加的地方，否则会在./wrf.exe时报错
     if WRF_version == 'WRFV3':

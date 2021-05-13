@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cmaps
 import os 
+import geopandas
 from zMap import set_grid, add_NamCo
 import warnings
 warnings.filterwarnings("ignore")
@@ -26,7 +27,17 @@ def load_wrfdata(data_dir):
 
     return prec, lats, lons, time 
 
+def load_mountain_shp():
+    f_in = '/home/zzhzhao/code/shpfiles/念青唐古拉山shp/念青唐古拉山.shp'
+    shp = geopandas.read_file(f_in, encoding='gbk')
+    shp = shp.to_crs(epsg=4326)
+    return shp
 
+def add_mountain(ax, linewidth=1):
+    shp = load_mountain_shp()
+    ax.add_geometries(shp.geometry, crs=ccrs.PlateCarree(), edgecolor='r', alpha=1, facecolor='none', lw=linewidth)
+
+#%%
 if __name__ == '__main__':
     test_number = 15
     data_dir1 = f'/home/zzhzhao/Model/wrfout/test-{test_number}'
@@ -55,12 +66,13 @@ if __name__ == '__main__':
     proj = ccrs.PlateCarree()
     # crange = np.arange(0, 200+10, 10)
     labels = ['WRF', 'WRF-nolake', 'CMFD', 'Difference']
-    fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(9,11), subplot_kw={'projection':proj})
+    fig, axes = plt.subplots(ncols=2, nrows=2, dpi=100, figsize=(9,11), subplot_kw={'projection':proj})
     fig.subplots_adjust(hspace=0.2, wspace=0.15)
     for i in range(2):
         for j in range(2):
             set_grid(axes[i, j], lat=[30, 31.5], lon=[90, 91.5], span=.5)
             add_NamCo(axes[i, j])
+            add_mountain(axes[i, j])
     for j, prec_sum in enumerate([prec1_sum, prec2_sum]):
         c = axes[0][j].pcolor(lons, lats, prec_sum, vmin=0, vmax=250, cmap=cmaps.WhiteBlueGreenYellowRed, transform=proj)
         axes[0][j].set_title(labels[j], fontsize=14, weight='bold')
