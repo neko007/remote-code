@@ -1,0 +1,77 @@
+# Lake variables
+
+state    logical lake2d           ij              misc        1         -      -       "lake2d"         "T/F: whether grid is lake"
+state    real    lakedepth2d      ij              misc        1         -     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "lakedepth2d"    "lake depth"       "m"  
+state    real    savedtke12d      ij              misc        1         -     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "savedtke12d"    "top level eddy conductivity from previous timestep"       "W/m.K"
+state    real    snowdp2d         ij              misc        1         -     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "snowdp2d"       "snow depth"       "m"  
+state    real    h2osno2d         ij              misc        1         -     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "h2osno2d"       "snow water"       "mm" 
+state    real    snl2d            ij              misc        1         -     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "snl2d"          "number of snow layers"
+state    real    t_grnd2d         ij              misc        1         -     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "t_grnd2d"       "ground temperature"     "k"  
+state    real    t_lake3d         i{lake_ll}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "t_lake3d"       "lake temperature"       "k"  
+state    real    lake_icefrac3d   i{lake_ll}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "lake_icefrac3d" "mass fraction of lake layer that is frozen"
+state    real    z_lake3d         i{lake_ll}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "z_lake3d"       "layer depth for lake"   "m"  
+state    real    dz_lake3d        i{lake_ll}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "dz_lake3d"      "layer thickness for lake"  "m"  
+state    real    t_soisno3d       i{lake_ssl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "t_soisno3d"     "soil (or snow) temperature"  "m"  
+state    real    h2osoi_ice3d     i{lake_ssl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "h2osoi_ice3d"   "ice lens"     "kg/m2"
+state    real    h2osoi_liq3d     i{lake_ssl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "h2osoi_liq3d"   "liquid water"  "kg/m2"
+state    real    h2osoi_vol3d     i{lake_ssl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "h2osoi_vol3d"   "volumetric soil water (0<=h2osoi_vol<=watsat)"   "m3/m3"
+state    real    z3d              i{lake_ssl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "z3d"            "layer depth for snow & soil"   "m"  
+state    real    dz3d             i{lake_ssl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "dz3d"           "layer thickness for soil or snow"    "m"  
+state    real    zi3d             i{lake_intl}j   misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "zi3d"           "interface level below a "z" level"   "m"  
+state    real    watsat3d         i{lake_sl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "watsat3d"       "volumetric soil water at saturation (porosity)"
+state    real    csol3d           i{lake_sl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "csol3d"         "heat capacity, soil solids"    "J/m**3/Kelvin"
+state    real    tkmg3d           i{lake_sl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "tkmg3d"         "thermal conductivity, soil minerals"     "W/m-K"
+state    real    tkdry3d          i{lake_sl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "tkdry3d"        "thermal conductivity, dry soil"         "W/m/Kelvin"
+state    real    tksatu3d         i{lake_sl}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)      "tksatu3d"       "thermal conductivity, saturated soil"    "W/m-K"
+
+state   integer  LAKEFLAG          -              misc         1        -     i0        "LAKEFLAG"         "Flag for lake  in the global attributes for metgrid data"
+state   integer  LAKE_DEPTH_FLAG   -              misc         1        -     i0        "LAKE_DEPTH_FLAG"   "Flag for lakedepth  in the global attributes for metgrid data"
+ 
+state   real     sabg_lakeout     ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "sabg_lakeout"       "SWDOWN absorbed by ground"  "W/m2"  
+state   real     cosz_lakeout     ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "cosz_lakeout"       "COSZEN output by LakeModel"  "-"  
+state   real     albedo_sols_yw   ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "albedo_sols_yw"     "vis direct albedo"     "-"  
+state   real     albedo_soll_yw   ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "albedo_soll_yw"     "vis direct albedo"     "-"  
+state   real     albedo_solsd_yw  ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "albedo_solsd_yw"    "vis direct albedo"     "-"  
+state   real     albedo_solld_yw  ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "albedo_solld_yw"    "vis direct albedo"     "-"  
+
+state   real     z0mg_yw          ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "z0mg_yw"    "surface momentum roughness" "m"  
+state   real     z0hg_yw          ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "z0hg_yw"    "surface sensible roughness" "m"  
+state   real     z0qg_yw          ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "z0qg_yw"    "surface latent   roughness" "m"  
+
+state   real     km_yw            ij    misc      1      -    i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)    "km_yw"      "molecular diffusivity"      "m**2/s"
+
+state   real     ke_yw        i{lake_ll}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)   "ke_yw"     "eddy diffusivity"       "m**2/s"  
+state   real     ked_yw       i{lake_ll}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)   "ked_yw"    "enhanced diffusivity"   "m**2/s"  
+state   real     kw_yw        i{lake_ll}j    misc        1         z     i012rhd=(interp_mask_water_field:lu_index,islake)u=(copy_fcnm)   "kw_yw"     "total diffusivity"      "m**2/s"  
+
+# Lake namelist options 
+rconfig   real     lakedepth_default      namelist,physics      max_domains      50       rh    "lakedepth_default"  "default lake depth"      "m"   
+rconfig   real     lake_min_elev          namelist,physics      max_domains       5       rh    "lake_min_elev"       ""                       ""   
+rconfig   integer  use_lakedepth          namelist,physics      max_domains       1       rh    "use_lakedepth"       ""                       ""   
+rconfig   logical  lakedebug_yw           namelist,physics      max_domains   .false.     rh    "lakedebug_yw"        ""                       ""   
+rconfig   logical  tlake_init_flag        namelist,physics      max_domains   .true.      rh    "tlake_init_flag"     ""                       ""   
+rconfig   real     tlake_init_value       namelist,physics      max_domains   276.05      rh    "tlake_init_value"    ""                       ""   
+rconfig   real     beta_yw                namelist,physics      max_domains     0.1       rh    "beta_yw"             ""                       ""   
+rconfig   logical  eta_flag               namelist,physics      max_domains   .true.      rh    "eta_flag"            ""                       ""   
+rconfig   real     eta_scale_yw           namelist,physics      max_domains     0.6       rh    "eta_scale_yw"        ""                       ""   
+rconfig   real     eta_yw                 namelist,physics      max_domains     0.1       rh    "eta_yw"              ""                       ""   
+rconfig   logical  roughness_flag         namelist,physics      max_domains   .true.      rh    "roughness_flag"      ""                       ""   
+rconfig   logical  diffusivity_flag       namelist,physics      max_domains   .true.      rh    "diffusivity_flag"    ""                       ""   
+rconfig   integer  diffusivity_index_yw   namelist,physics      max_domains       1       rh    "diffusivity_index_yw"       ""                       ""   
+rconfig   real     tdmax                  namelist,physics      max_domains    274.2      rh    "tdmax"               ""                       ""   
+rconfig   real     mixing_factor          namelist,physics      max_domains     40.       rh    "mixing_factor"       ""                       ""   
+rconfig   real     mixing_factor_ked      namelist,physics      max_domains     40.       rh    "mixing_factor_ked"   ""                       ""   
+rconfig   integer  start_yr_yw            namelist,physics      max_domains    1993       rh    "start_yr_yw"         ""                       ""   
+rconfig   integer  start_day_yw           namelist,physics      max_domains     349       rh    "start_day_yw"        ""                       ""   
+rconfig   integer  start_sec_yw           namelist,physics      max_domains       0       rh    "start_sec_yw"        ""                       ""   
+rconfig   logical  coszen_flag            namelist,physics      max_domains   .true.      rh    "coszen_flag"         ""                       ""   
+rconfig   logical  albedo_flag            namelist,physics      max_domains   .true.      rh    "albedo_flag"         ""                       ""   
+rconfig   real     sabg_factor            namelist,physics      max_domains       1.      rh    "sabg_factor"         ""                       ""   
+rconfig   real     alb_wat                namelist,physics      max_domains     0.08      rh    "alb_wat"             ""                       ""   
+rconfig   real     alb_ice                namelist,physics      max_domains      0.6      rh    "alb_ice"             ""                       ""  
+
+
+# Lake packages
+
+package   nolake       sf_lake_physics==0   -   -
+package   simple_lake  sf_lake_physics==1   -   scalar:lake2d,lakedepth2d,savedtke12d,snowdp2d,h2osno2d,snl2d,t_grnd2d,t_lake3d,lake_icefrac3d,z_lake3d,dz_lake3d,t_soisno3d,h2osoi_ice3d,h2osoi_liq3d,h2osoi_vol3d,z3d,dz3d,zi3d,watsat3d,csol3d,tkmg3d,tkdry3d,tksatu3d,sabg_lakeout,cosz_lakeout,albedo_sols_yw,albedo_soll_yw,albedo_solsd_yw,albedo_solld_yw

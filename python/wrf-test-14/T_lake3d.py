@@ -45,10 +45,12 @@ if __name__ == '__main__':
     testname_list = [
         'test-14',
         'test-14-oriLD',
+        'test-19',
         'test-15',
         'test-15-oriLD',
         'test-17',
-        'test-18'
+        'test-18',
+        'test-20',
         ]
     N_test = len(testname_list)
 
@@ -71,12 +73,14 @@ if __name__ == '__main__':
     titles = [
         'Wuyang_90m', 
         'Wuyang_0.5m',
+        'Default_90m', 
         'Default_50m', 
         'Default_0.5m',
         'Wuyang_50m', 
-        'Wuyang_20m'
+        'Wuyang_20m',
+        'Wuyang_90m_Update',
         ]
-    ylen = N_test//2; xlen = np.ceil(N_test/ylen).astype(int)
+    ylen = np.ceil(np.sqrt(N_test)).astype(int); xlen = np.ceil(N_test/ylen).astype(int)
     default_len = 5
 
     fig = plt.figure(figsize=(xlen*default_len, ylen*default_len), dpi=100)

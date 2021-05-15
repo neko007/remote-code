@@ -1,0 +1,42 @@
+#!/bin/bash
+#========================================================================
+#|---------------------File Name: YW_Modify_WRF.bsh------------------------|
+#========================================================================
+#      Script Usage: 
+#        Created by: ---------- Yang Wu ----------- 
+#                             Ph.D. Student 
+#                    School of Atmospheric Sciences 
+#                    Email: YangWu@smail.nju.edu.cn 
+#                    ----- Nanjing University ----- 
+#                                                   
+# Records of Revisions:                             
+#   Date     Programmer    Description of change    
+# ========   ==========    =====================    
+# 14/03/19   YangWu        V.1.0                    
+#========================================================================
+
+  com_dir=/home/zzhzhao/Model/tests # Top Dir 
+  WRF_V_Ori=test-runtimeIO        # WRF_Version Old 
+  WRF_V_New=original-WRF3.9.1-YW_Lake-comp2             # Directory with New WRFFiles
+  Main_Lake_Code=YangW_module_sf_lake.F            # Lake Code name
+  WRF_version=WRFV3
+
+  read -p "Modify WRF_Files in ${WRF_V_Ori} ? " Ori_Flag ; echo -e "\n"
+  if [ "${Ori_Flag}" == "Y" ]; then
+       cp ${com_dir}/Modified_WRF_Files/YangW_Registry.EM_COMMON                       ${com_dir}/${WRF_V_Ori}/WRF/Registry/Registry.EM_COMMON
+  fi
+
+  read -p "Modify WRF_Files in ${WRF_V_New} ? " Modified_25nlevlake_Flag ; echo -e "\n"
+  if [ "${Modified_25nlevlake_Flag}" == "Y" ]; then
+       cp ${com_dir}/Modified_WRF_Files/YangW_Registry.EM_COMMON        ${com_dir}/${WRF_V_New}/${WRF_version}/Registry/Registry.EM_COMMON
+       cp ${com_dir}/Modified_WRF_Files/${Main_Lake_Code}               ${com_dir}/${WRF_V_New}/${WRF_version}/phys/module_sf_lake.F
+       #--- For 25nlevlake ---#
+       cp ${com_dir}/Modified_WRF_Files/YangW_registry.lake             ${com_dir}/${WRF_V_New}/${WRF_version}/Registry/registry.lake
+       cp ${com_dir}/Modified_WRF_Files/YangW_registry.dimspec          ${com_dir}/${WRF_V_New}/${WRF_version}/Registry/registry.dimspec
+       #--- For Calling External Parameters ---#
+       cp ${com_dir}/Modified_WRF_Files/YangW_module_surface_driver.F         ${com_dir}/${WRF_V_New}/${WRF_version}/phys/module_surface_driver.F
+       cp ${com_dir}/Modified_WRF_Files/YangW_module_first_rk_step_part1.F    ${com_dir}/${WRF_V_New}/${WRF_version}/dyn_em/module_first_rk_step_part1.F
+       cp ${com_dir}/Modified_WRF_Files/YangW_module_physics_init.F           ${com_dir}/${WRF_V_New}/${WRF_version}/phys/module_physics_init.F
+       cp ${com_dir}/Modified_WRF_Files/YangW_start_em.F                      ${com_dir}/${WRF_V_New}/${WRF_version}/dyn_em/start_em.F
+  fi
+

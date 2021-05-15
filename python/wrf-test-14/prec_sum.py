@@ -29,7 +29,6 @@ def load_wrfdata(data_dir):
     return prec, lats, lons, time 
 
 
-
 #%%
 if __name__ == '__main__':
     data_dir1 = '/home/zzhzhao/Model/wrfout/test-15-oriLD'

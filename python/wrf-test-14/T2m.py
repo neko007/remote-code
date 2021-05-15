@@ -15,17 +15,22 @@ import salem
 import warnings
 warnings.filterwarnings("ignore")
 
-def load_wrfdata(data_dir):
+def load_wrfdata1(data_dir):
     wrf_files = [f for f in os.listdir(data_dir) if f[11]=='2']
     wrflist = [Dataset(os.path.join(data_dir, wrf_file)) for wrf_file in wrf_files] # 
 
     tsk = w.getvar(wrflist, 'TSK', timeidx=w.ALL_TIMES, method='cat')
 
-    # ### 强制附上salem的grid属性，才能施以salem独有的方法
-    # tsk.attrs['pyproj_srs'] = salem.open_wrf_dataset(os.path.join(data_dir, wrf_files[0])).attrs['pyproj_srs']
+    lats, lons = w.latlon_coords(tsk)
+    time = tsk.Time.to_index() 
 
-    # del tsk.attrs['projection']
-    # del tsk.attrs['coordinates']
+    return tsk, lats, lons, time 
+
+def load_wrfdata2(data_dir):
+    wrf_files = [f for f in os.listdir(data_dir) if f[11]=='2']
+    wrflist = [Dataset(os.path.join(data_dir, wrf_file)) for wrf_file in wrf_files] # 
+
+    tsk = w.getvar(wrflist, 'T2', timeidx=w.ALL_TIMES, method='cat')
 
     lats, lons = w.latlon_coords(tsk)
     time = tsk.Time.to_index() 
@@ -69,7 +74,6 @@ def load_modis(file_path):
 if __name__ == '__main__':
     data_dir = '/home/zzhzhao/Model/wrfout'
     testname_list = [
-        'modis',
         'test-14',
         'test-14-oriLD',
         'test-19',
@@ -81,34 +85,39 @@ if __name__ == '__main__':
         ]
     N_test = len(testname_list)
 
+    t_diff_list = dict()
     tsk_list = dict()
-    tsk_NamCo_daily_list = dict()
+    t2_list = dict()
+
     for testname in testname_list:
-        if testname == 'modis':
-            file_path = "/home/Public_Data/MODIS/MOD11A1/MOD11A1_NamCo_2017.nc"
-            tsk_list[testname] = load_modis(file_path)
-            tsk_NamCo_daily_list[testname] = tsk_list[testname]
-        else:
-            data_path = os.path.join(data_dir, testname)
-            tsk, lats, lons, time = load_wrfdata(data_path)
-            tsk = xr.where(tsk>0, tsk, np.nan)
-            tsk_list[testname] = tsk
+        data_path = os.path.join(data_dir, testname)
+        tsk, lats, lons, time = load_wrfdata1(data_path)
+        t2, lats, lons, time = load_wrfdata2(data_path)
+        tsk = xr.where(tsk>0, tsk, np.nan)
+        t2 = xr.where(t2>0, t2, np.nan)
+        # t_diff = t2 - tsk       
 
-            mask = mask_lake(data_path, load_NamCo_shp())
-            tsk_NamCo = tsk.where(mask) # 切出NamCo范围
-            tsk_NamCo_mean = tsk_NamCo.mean(dim=['west_east','south_north'])
-            # tsk_NamCo_mean = tsk_NamCo.isel(west_east=74, south_north=39)
-            
+        mask = mask_lake(data_path, load_NamCo_shp())
+        # t_diff_NamCo = t_diff.where(mask) # 切出NamCo范围
+        # t_diff_NamCo_mean = t_diff_NamCo.mean(dim=['west_east','south_north']).resample(Time='D').mean()
 
-            ### 取3 UTC和6 UTC的平均
-            hour_list = [3, 6]
-            tsk_NamCo_daily = tsk_NamCo_mean.sel(Time=tsk_NamCo_mean.Time.dt.hour.isin(hour_list)).resample(Time='D').mean()
-            tsk_NamCo_daily_list[testname] = tsk_NamCo_daily
+        # t_diff_list[testname] = t_diff_NamCo_mean
+
+        t2_NamCo = t2.where(mask) # 切出NamCo范围
+        t2_NamCo_mean = t2_NamCo.mean(dim=['west_east','south_north'])#.resample(Time='D').mean()
+        tsk_NamCo = tsk.where(mask) # 切出NamCo范围
+        tsk_NamCo_mean = tsk_NamCo.mean(dim=['west_east','south_north'])#.resample(Time='D').mean()
+        t2_list[testname] = t2_NamCo_mean
+        tsk_list[testname] = tsk_NamCo_mean
+
+        ### 取3 UTC和6 UTC的平均
+        # hour_list = [3, 6]
+        # tsk_NamCo_daily = tsk_NamCo_mean.sel(Time=tsk_NamCo_mean.Time.dt.hour.isin(hour_list)).resample(Time='D').mean()
+        # tsk_NamCo_daily_list[testname] = tsk_NamCo_daily
 
 
 #%%
     labels = [
-        'Modis',
         'Wuyang_90m', 
         'Wuyang_0.5m',
         'Default_90m',
@@ -118,16 +127,33 @@ if __name__ == '__main__':
         'Wuyang_20m',
         'Wuyang_90m_Update'
         ]
-    markers = list('P^.sxD+*p')
-    fig, ax = plt.subplots(dpi=100)
-    for i, testname in enumerate(testname_list):
-        var = tsk_NamCo_daily_list[testname]
+    # markers = list('P^.sxD+*p')
+    # fig, ax = plt.subplots(dpi=100)
+    # for i, testname in enumerate(testname_list):
+    #     var = t_diff_list[testname]
 
-        var.plot.line(lw=1, marker=markers[i], mfc='none', label=labels[i], ax=ax)
-        ax.legend(loc=2, bbox_to_anchor=(1.0,1.0), borderaxespad=0, frameon=False)
+    #     var.plot.line(lw=0, marker=markers[i], mfc='none', label=labels[i], ax=ax)
+    #     ax.legend(loc=2, bbox_to_anchor=(1.0,1.0), borderaxespad=0, frameon=False)
+    #     import matplotlib.dates as mdate  
+    #     ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
+
+
+    ylen = np.ceil(np.sqrt(N_test)).astype(int); xlen = np.ceil(N_test/ylen).astype(int)
+    default_len = 5
+
+    fig = plt.figure(figsize=(xlen*default_len, ylen*default_len), dpi=100)
+    fig.subplots_adjust(hspace=0.3, wspace=0.2)
+    for i, testname in enumerate(testname_list):
+        ax = fig.add_subplot(ylen, xlen, i+1)
+
+        var1 = t2_list[testname]
+        var2 = tsk_list[testname]
+        var1.plot.line('r', mfc='none', label='T2', add_labels=False, ax=ax)
+        var2.plot.line('b', mfc='none', label='TSK', add_labels=False, ax=ax)
+        ax.set_title(labels[i])
+
         import matplotlib.dates as mdate  
         ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
 
-    # fig.savefig('fig/lwst_alltest.jpg', dpi=300, bbox_inches='tight', pad_inches=0.1)
 
     

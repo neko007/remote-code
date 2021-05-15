@@ -74,7 +74,7 @@ sst_flag = 0
 
 ### lake option
 sf_lake_physics   = 1 # WRF-Lake开关
-alternative_lswt  = 1 # 用WRF默认程式替代湖温
+alternative_lswt  = 1 # 用WRF默认程式替代湖温（效果不佳）
 alternative_lake  = 1 # 用相邻下垫面替换湖泊
 use_lakedepth     = 1 # 是否使用静态地形数据中的湖深
 md_lakedepth      = 1 # 替换纳木错湖泊深度（一般与alternative_lake相反）

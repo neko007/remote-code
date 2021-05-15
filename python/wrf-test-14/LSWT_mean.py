@@ -67,17 +67,17 @@ def load_modis(file_path):
 
 #%%
 if __name__ == '__main__':
-    data_dir1 = '/home/zzhzhao/Model/wrfout/test-17'
-    data_dir2 = '/home/zzhzhao/Model/wrfout/test-18'
+    data_dir1 = '/home/zzhzhao/Model/wrfout/test-14-oriLD'
+    data_dir2 = '/home/zzhzhao/Model/wrfout/test-15'
     # data_dir1 = '/home/zzhzhao/Model/wrfout/test-14-oriLD'
     # data_dir2 = '/home/zzhzhao/Model/wrfout/test-14-nolake-oriLD'
     tsk1, lats, lons, time = load_wrfdata(data_dir1)
     tsk2, lats, lons, time = load_wrfdata(data_dir2) 
 
     mask = mask_lake(data_dir1, load_NamCo_shp())
-    tsk1_lake = tsk1.where(mask, drop=True) # 切出NamCo范围
+    tsk1_lake = tsk1.where(mask) # 切出NamCo范围
     tsk1_lake_mean = tsk1_lake.mean(dim=['west_east','south_north'])
-    tsk2_lake = tsk2.where(mask, drop=True) # 切出NamCo范围
+    tsk2_lake = tsk2.where(mask) # 切出NamCo范围
     tsk2_lake_mean = tsk2_lake.mean(dim=['west_east','south_north'])
 
     ### MODIS
