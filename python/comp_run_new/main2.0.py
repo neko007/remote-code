@@ -55,6 +55,8 @@ def run_wrf():
     # 生成初始场
     print('>>>> real.exe <<<<')
     sp.run('mpirun -np 1 ./real.exe', shell=True)
+    # 修改初始湖温
+    modify_lswt(lswt_init_flag)
     # 新建wrfout输出文件夹
     if os.path.exists(wrfout_path):
         print('*** Warning: path exists ***')
@@ -111,7 +113,7 @@ def remove_lake(alternative_lake):
     '''
     if alternative_lake == 1:
         print('>>>> remove lake <<<<')
-        sp.run('source activate geocat', shell=True)
+        # sp.run('conda activate geocat', shell=True)
         sp.run(f'python {comp_run_dir}/remove_lake.py', shell=True)
     else:
         return 0
@@ -124,7 +126,7 @@ def modify_lakedepth(md_lakedepth, alternative_lake):
         print('*** Warning: no need for modifing lakedepth ***')
     elif md_lakedepth == 1:
         print('>>>> modify lakedepth <<<<')
-        sp.run('source activate geocat', shell=True)
+        # sp.run('conda activate geocat', shell=True)
         sp.run(f'python {comp_run_dir}/lakedepth.py', shell=True)
     else:
         return 0
@@ -135,8 +137,18 @@ def modify_mountainHeight(md_mountainHeight):
     '''
     if md_mountainHeight == 1:
         print('>>>> modify mountainHeight <<<<')
-        sp.run('source activate geocat', shell=True)
+        # sp.run('conda activate geocat', shell=True)
         sp.run(f'python {comp_run_dir}/remove_mountain.py', shell=True)
+    else:
+        return 0
+
+def modify_lswt(lswt_init_flag):
+    '''
+    去除念青唐古拉山
+    '''
+    if lswt_init_flag == 1:
+        print('>>>> modify LSWT <<<<')
+        sp.run(f'python {comp_run_dir}/lswt.py', shell=True)
     else:
         return 0
 

@@ -46,15 +46,15 @@ def mask_lake(data_dir, shp):
     mask = xr.where(lu_lake.notnull(), True, False)
     return mask
 
-def load_modis(file_path):
+def load_modis(file_path, day_or_night='Day'):
     modis = salem.open_xr_dataset(file_path)
     time = modis.indexes['time'].to_datetimeindex()
     modis.coords['time'] = time
     modis = modis.sel(time=pd.date_range('2017-06-01','2017-06-30'))
-    modis_lake = modis['LST_Day_1km'].salem.roi(shape=load_NamCo_shp()) 
+    modis_lake = modis[f'LST_{day_or_night}_1km'].salem.roi(shape=load_NamCo_shp()) 
 
     ### 质量控制
-    qc = modis['QC_Day'].sel(time=pd.date_range('2017-06-01','2017-06-30'))
+    qc = modis[f'QC_{day_or_night}'].sel(time=pd.date_range('2017-06-01','2017-06-30'))
     qc_lake = qc.salem.roi(shape=load_NamCo_shp())
     total_lakegrid = qc_lake.isel(time=0).count().values # 湖泊格点总数
     modis_lake_qc = modis_lake.where(modis_lake.count(dim=['lon','lat']) >= total_lakegrid/2.) # 有效湖泊格点数>=湖泊总格点数的1/2
@@ -71,22 +71,26 @@ if __name__ == '__main__':
     testname_list = [
         'modis',
         'test-14',
-        'test-14-oriLD',
+        # 'test-14-oriLD',
         'test-19',
         'test-15',
-        'test-15-oriLD',
+        # 'test-15-oriLD',
         'test-17',
-        'test-18',
-        'test-20',
+        # 'test-18',
+        # 'test-20',
+        # 'test-22',
+        'test-23',
+        'test-24',
         ]
     N_test = len(testname_list)
 
+    day_or_night = 'Night'
     tsk_list = dict()
     tsk_NamCo_daily_list = dict()
     for testname in testname_list:
         if testname == 'modis':
             file_path = "/home/Public_Data/MODIS/MOD11A1/MOD11A1_NamCo_2017.nc"
-            tsk_list[testname] = load_modis(file_path)
+            tsk_list[testname] = load_modis(file_path, day_or_night=day_or_night)
             tsk_NamCo_daily_list[testname] = tsk_list[testname]
         else:
             data_path = os.path.join(data_dir, testname)
@@ -101,7 +105,8 @@ if __name__ == '__main__':
             
 
             ### 取3 UTC和6 UTC的平均
-            hour_list = [3, 6]
+            # hour_list = [3, 6]
+            hour_list = [15, 18]
             tsk_NamCo_daily = tsk_NamCo_mean.sel(Time=tsk_NamCo_mean.Time.dt.hour.isin(hour_list)).resample(Time='D').mean()
             tsk_NamCo_daily_list[testname] = tsk_NamCo_daily
 
@@ -110,15 +115,18 @@ if __name__ == '__main__':
     labels = [
         'Modis',
         'Wuyang_90m', 
-        'Wuyang_0.5m',
+        # 'Wuyang_0.5m',
         'Default_90m',
         'Default_50m', 
-        'Default_0.5m',
+        # 'Default_0.5m',
         'Wuyang_50m', 
-        'Wuyang_20m',
-        'Wuyang_90m_Update'
+        # 'Wuyang_20m',
+        # 'Wuyang_90m_Update',
+        # 'Wuyang_90m_277K',
+        'Wuyang_90m_279.5K',
+        'Default_90m_277K',
         ]
-    markers = list('P^.sxD+*p')
+    markers = list('P^.sxD+*p12')
     fig, ax = plt.subplots(dpi=100)
     for i, testname in enumerate(testname_list):
         var = tsk_NamCo_daily_list[testname]

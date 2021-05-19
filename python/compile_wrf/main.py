@@ -4,11 +4,12 @@ import glob
 
 if __name__ == '__main__':
     Model_dir = '/home/zzhzhao/Model'
-    test_dir = os.path.join(Model_dir, 'test')
+    test_dir = os.path.join(Model_dir, 'tests')
     source_name = 'original-WRF3.9.1'
-    target_name = 'original-WRF3.9.1-YW_Lake-comp3'
+    target_name = 'original-WRF3.9.1-YW_Lake-comp4'
     WRF_version = 'WRFV3'
     Modified_wrf_files_path = '/home/zzhzhao/code/python/compile_wrf/Modified_WRF_Files'
+    geogrid_tbl_source_path = '/home/zzhzhao/Model/tests/original-comp/WPS/geogrid/GEOGRID.TBL.ARW'
 
     wrf_compile_option = 15
     wps_compile_option = 17
@@ -21,7 +22,8 @@ if __name__ == '__main__':
     os.chdir(test_dir)
     sp.run(f'cp -r {source_name} {target_name}', shell=True)
 
-    ### 复制吴阳程序
+    ### 复制吴阳程序 
+    print('>>>> Copy Wuyang files <<<<')
     sp.run(f'cp {Modified_wrf_files_path}/YangW_Registry.EM_COMMON {WRF_path}/Registry/Registry.EM_COMMON', shell=True)
     sp.run(f'cp {Modified_wrf_files_path}/YangW_module_sf_lake.F {WRF_path}/phys/module_sf_lake.F', shell=True)
     sp.run(f'cp {Modified_wrf_files_path}/YangW_registry.lake {WRF_path}/Registry/registry.lake', shell=True)
@@ -58,5 +60,9 @@ if __name__ == '__main__':
     else: 
         print('xxxx Error: WPS Compile Fail xxxx')
         os._exit(0)
+    
+    ### 复制GEOGRID.TBL.ARW
+    print('>>>> Copy GEOGRID.TBL.ARW <<<<')
+    sp.run(f"cp {geogrid_tbl_source_path} {os.path.join(WPS_path, 'geogrid/GEOGRID.TBL.ARW')}")
 
     print('**** Compile Success! ****')

@@ -25,9 +25,9 @@ interval_seconds   = interval_hours * 3600
 num_metgrid_levels =  32
 
 # 模拟的起止时间
-y_start, m_start, d_start, h_start = 2020, 9, 1, 00
-y_end, m_end, d_end, h_end         = 2020, 9, 3, 00
-run_days                           = 2
+y_start, m_start, d_start, h_start = 2017, 6, 1, 00
+y_end, m_end, d_end, h_end         = 2017, 7, 1, 00
+run_days                           = 30
 run_hours                          = 0
 
 # restart设置
@@ -43,34 +43,31 @@ auxhist2_interval   = 180
 frames_per_auxhist2 = 8
 
 # 嵌套区域相关配置
-max_dom            = 1
+max_dom            = 2
 parent_ids         = [1, 1]
 parent_grid_ratios = [1, 3]
 
 # 每个区域的起止经纬度， 按照d01、d02...的顺序排列
 lat_mins = [
-    20, 
-    30
+    19, 
+    29
     ]
 lat_maxs = [
-    55, 
-    45
+    43, 
+    33
     ]
 lon_mins = [
-    80, 
-    105
+    77, 
+    87
     ]
 lon_maxs = [
-    145, 
-    125
+    103, 
+    93
     ]
 
 # 父区域分辨率
-dx = 30000
-dy = 30000
-
-# 引入海温场
-sst_flag = 0
+dx = 15000
+dy = 15000
 
 ### lake option
 sf_lake_physics   = 1 # WRF-Lake开关
@@ -81,20 +78,27 @@ md_lakedepth      = 1 # 替换纳木错湖泊深度（一般与alternative_lake�
 lakedepth_default = 50. # 默认湖泊深度，use_lakedepth=0时生效
 
 ### lake option based on Wuyang (part)
-### WRF_version = 'WRFV3' 时方可生效
+### WRF_version  = 'WRFV3' 时方可生效
 tlake_init_flag      = True
 tlake_init_value     = 276.05
 eta_flag             = True
-eta_scale_yw         = 0.6
+eta_scale_yw         = 0.575 # default: 0.6
 eta_yw               = 0.1
 diffusivity_flag     = True
-diffusivity_index_yw = 1
+diffusivity_index_yw = 4 # default: 1
 tdmax                = 274.2
-mixing_factor        = 40
+mixing_factor        = 100 # default: 40
 mixing_factor_ked    = 40
+
+### zzz强制更改wrfinput_d0x湖温
+lswt_init_flag       = False
+lswt_init            = 277.
 
 ### mountain
 md_mountainHeight = 0 # 修改念青唐古拉山高度
+
+# 引入海温场
+sst_flag = 0
 
 # chem
 chem = 0

@@ -15,9 +15,9 @@ def threshold(prec):
         threshold_seasons[season] = np.percentile(var, 85)
     return threshold_seasons
 
-def pick_2017(prec_NamCo_daily):
-    prec_NamCo_2017 = prec_NamCo_daily.sel(time=slice('2017-5', '2017-10'))
-    prec_NamCo_2017.plot.step()
+def pick_yyyy(prec_NamCo_daily, year=2017):
+    prec_NamCo_yyyy = prec_NamCo_daily.sel(time=slice(f'{year}-8-23', f'{year}-9-1'))
+    prec_NamCo_yyyy.plot.step()
 #%%
 if __name__ == '__main__':
     data_path = '/home/zzhzhao/data/CMFD_Prec_TP/CMFD_Prec_TP_1979-2018.nc'

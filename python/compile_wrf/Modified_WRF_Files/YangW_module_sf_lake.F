@@ -5110,6 +5110,7 @@ SUBROUTINE lakeini(IVGTYP,         ISLTYP,          HT,              SNOW,      
                      t_soisno3d(i,k,j)      = 277.0
                      t_lake3d(i,k,j)        = 277.0
                   end if 
+               end do
             end if
         end if
 

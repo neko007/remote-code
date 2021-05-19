@@ -75,13 +75,17 @@ if __name__ == '__main__':
     data_dir = '/home/zzhzhao/Model/wrfout'
     testname_list = [
         'test-14',
-        'test-14-oriLD',
+        # 'test-14-oriLD',
         'test-19',
         'test-15',
-        'test-15-oriLD',
+        # 'test-15-oriLD',
         'test-17',
-        'test-18',
+        # 'test-18',
         'test-20',
+        # 'test-21',
+        'test-22',
+        'test-23',
+        'test-24',
         ]
     N_test = len(testname_list)
 
@@ -119,23 +123,18 @@ if __name__ == '__main__':
 #%%
     labels = [
         'Wuyang_90m', 
-        'Wuyang_0.5m',
+        # 'Wuyang_0.5m',
         'Default_90m',
         'Default_50m', 
-        'Default_0.5m',
+        # 'Default_0.5m',
         'Wuyang_50m', 
-        'Wuyang_20m',
-        'Wuyang_90m_Update'
+        # 'Wuyang_20m',
+        'Wuyang_90m_Update',
+        # 'Wuyang_90m_Update2',
+        'Wuyang_90m_277K',
+        'Wuyang_90m_279.5K',
+        'Default_90m_277K',
         ]
-    # markers = list('P^.sxD+*p')
-    # fig, ax = plt.subplots(dpi=100)
-    # for i, testname in enumerate(testname_list):
-    #     var = t_diff_list[testname]
-
-    #     var.plot.line(lw=0, marker=markers[i], mfc='none', label=labels[i], ax=ax)
-    #     ax.legend(loc=2, bbox_to_anchor=(1.0,1.0), borderaxespad=0, frameon=False)
-    #     import matplotlib.dates as mdate  
-    #     ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
 
 
     ylen = np.ceil(np.sqrt(N_test)).astype(int); xlen = np.ceil(N_test/ylen).astype(int)
@@ -148,8 +147,8 @@ if __name__ == '__main__':
 
         var1 = t2_list[testname]
         var2 = tsk_list[testname]
-        var1.plot.line('r', mfc='none', label='T2', add_labels=False, ax=ax)
-        var2.plot.line('b', mfc='none', label='TSK', add_labels=False, ax=ax)
+        var1.plot.line('r', mfc='none', label='T2', ax=ax)
+        var2.plot.line('b', mfc='none', label='TSK', ax=ax)
         ax.set_title(labels[i])
 
         import matplotlib.dates as mdate  

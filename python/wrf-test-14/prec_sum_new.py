@@ -35,13 +35,15 @@ if __name__ == '__main__':
     testname_list = [
         'cmfd',
         'test-14',
-        'test-14-oriLD',
+        # 'test-14-oriLD',
         'test-19',
         'test-15',
-        'test-15-oriLD',
+        # 'test-15-oriLD',
         'test-17',
         'test-18',
         'test-20',
+        'test-24-pre',
+        'test-24',
         ]
     
     N_test = len(testname_list)
@@ -68,13 +70,15 @@ if __name__ == '__main__':
     labels = [
         'CMFD',
         'Wuyang_90m', 
-        'Wuyang_0.5m',
+        # 'Wuyang_0.5m',
         'Default_90m',
         'Default_50m', 
-        'Default_0.5m',
+        # 'Default_0.5m',
         'Wuyang_50m', 
         'Wuyang_20m',
-        'Wuyang_90m_Update'
+        'Wuyang_90m_Update',
+        'Default_90m_279.5K',
+        'Default_90m_277K',
         ]
     proj = ccrs.PlateCarree()
     cmap = cmaps.WhiteBlueGreenYellowRed
@@ -93,11 +97,12 @@ if __name__ == '__main__':
             lat, lon = lats, lons
     
         set_grid(ax, lat=[30, 31.5], lon=[90, 91.5], span=.5)
+        # set_grid(ax, lat=[29, 32], lon=[89, 92], span=.5)
         add_NamCo(ax)
         c = ax.pcolor(lon, lat, var, cmap=cmap, vmin=0, vmax=250, transform=proj)
         ax.set_title(labels[i])
      
-        axes.append(ax)
+        # axes.append(ax)
         
     # cb = fig.colorbar(c, ax=np.array(axes).all(), orientation='horizontal', pad=0.05, shrink=0.9, aspect=35)
     # cb.set_label('Precipitation / mm', fontsize=14)

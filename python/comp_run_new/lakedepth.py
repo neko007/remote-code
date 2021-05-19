@@ -4,6 +4,8 @@ import salem
 import geopandas
 import os 
 from modify_nml2 import max_dom, wps_dir
+import warnings
+warnings.filterwarnings("ignore")
 
 def load_NamCo_shp():
     f_in = '/home/zzhzhao/code/shpfiles/boundary/hyd1_4m/hyd1_4p.shp'

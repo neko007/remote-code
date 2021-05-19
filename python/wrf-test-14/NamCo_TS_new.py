@@ -32,13 +32,15 @@ if __name__ == '__main__':
         'cmfd',
         # 'obs',
         'test-14',
-        'test-14-oriLD',
+        # 'test-14-oriLD',
         'test-19',
-        'test-15',
-        'test-15-oriLD',
-        'test-17',
-        'test-18',
+        # 'test-15',
+        # 'test-15-oriLD',
+        # 'test-17',
+        # 'test-18',
         'test-20',
+        'test-23',
+        'test-24',
         ]
     
     N_test = len(testname_list)
@@ -74,13 +76,15 @@ if __name__ == '__main__':
         'CMFD',
         # 'StaObs',
         'Wuyang_90m', 
-        'Wuyang_0.5m',
+        # 'Wuyang_0.5m',
         'Default_90m',
-        'Default_50m', 
-        'Default_0.5m',
-        'Wuyang_50m', 
-        'Wuyang_20m',
-        'Wuyang_90m_Update'
+        # 'Default_50m', 
+        # 'Default_0.5m',
+        # 'Wuyang_50m', 
+        # 'Wuyang_20m',
+        'Wuyang_90m_Update',
+        'Wuyang_90m_279.5K',
+        'Default_90m_277K',
         ]
     markers = list('PX^.sxD+*p')
     fig, ax = plt.subplots(dpi=200)
@@ -88,27 +92,9 @@ if __name__ == '__main__':
         var = prec_mean_list[testname]
 
         # var.plot.line(lw=0, marker=markers[i], mfc='none', label=labels[i], ax=ax)
-        var.plot.line(lw=1, mfc='none', label=labels[i], ax=ax)
+        var.plot.line(lw=1.2, mfc='none', label=labels[i], ax=ax)
         ax.legend(loc=2, bbox_to_anchor=(1.0,1.0), borderaxespad=0, frameon=False)
         import matplotlib.dates as mdate  
         ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
 
     # fig.savefig('fig/prec_sta_alltest.jpg', dpi=300, bbox_inches='tight', pad_inches=0.1)
-
-#%%
-    fig, ax = plt.subplots(figsize=(9,4))
-    ax.plot(obs_NamCo.index, obs_NamCo, lw=1.4, c='k', marker='o', mfc=None, markersize=3.5, label='OBS')
-    ax.plot(prec1_NamCo.Time, prec1_NamCo, lw=1.4, c='r', marker='o', mfc=None, markersize=3.5, label='Ctrl')
-    ax.plot(prec2_NamCo.Time, prec2_NamCo, lw=1.4, c='g', marker='o', mfc=None, markersize=3.5, label='nolake')
-    # ax.plot(trmm_NamCo.TIME, trmm_NamCo, lw=1.4, c='b', marker='o', mfc=None, markersize=3.5, label='TRMM')
-    ax.plot(cmfd_NamCo.time, cmfd_NamCo, lw=1.4, c='b', marker='o', mfc=None, markersize=3.5, label='CMFD')
-    ax.set_title('NamCo Station', loc='left', y=0.9, x=0.02, fontsize=14, weight='bold')
-    ax.set_ylabel('Precipitation $\mathrm{mmd^{-1}}$', fontsize=14)
-    ax.legend(fontsize=13, loc='upper right', ncol=2, frameon=False)
-    ax.set_ylim([-1, 20])
-
-    import matplotlib.dates as mdate    
-    ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
-
-    fig.savefig('fig/TS.jpg', dpi=300)
-    # fig.savefig('TS.eps',dpi=300,format='eps')
