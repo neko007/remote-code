@@ -15,8 +15,8 @@ import salem
 import warnings
 warnings.filterwarnings("ignore")
 
-def load_wrfdata(data_dir):
-    wrf_files = [f for f in os.listdir(data_dir) if f[11]=='2']
+def load_wrfdata(data_dir, domain):
+    wrf_files = [f for f in os.listdir(data_dir) if f[11]==f'{domain}']
     wrflist = [Dataset(os.path.join(data_dir, wrf_file)) for wrf_file in wrf_files] # 
 
     tsk = w.getvar(wrflist, 'TSK', timeidx=w.ALL_TIMES, method='cat')
@@ -39,8 +39,8 @@ def load_NamCo_shp():
     shp = shp.loc[shp['NAME'].isin(["纳木错"])]
     return shp
 
-def mask_lake(data_dir, shp):
-    geo_path = '/home/zzhzhao/Model/tests/test-14/WPS/geo_em.d02.nc'
+def mask_lake(data_dir, shp, testname, domain):
+    geo_path = f'/home/zzhzhao/Model/tests/{testname}/WPS/geo_em.d{domain:0>2d}.nc'
     lu = salem.open_wrf_dataset(os.path.join(data_dir, geo_path))['LU_INDEX'].isel(time=0)
     lu_lake = lu.salem.roi(shape=shp)
     mask = xr.where(lu_lake.notnull(), True, False)
@@ -81,10 +81,12 @@ if __name__ == '__main__':
         # 'test-22',
         'test-23',
         'test-24',
+        'test-24-ERA5'
         ]
     N_test = len(testname_list)
 
-    day_or_night = 'Night'
+    day_or_night = 'Day'
+    # day_or_night = 'Night'
     tsk_list = dict()
     tsk_NamCo_daily_list = dict()
     for testname in testname_list:
@@ -94,19 +96,22 @@ if __name__ == '__main__':
             tsk_NamCo_daily_list[testname] = tsk_list[testname]
         else:
             data_path = os.path.join(data_dir, testname)
-            tsk, lats, lons, time = load_wrfdata(data_path)
+            domain = 1 if 'ERA5' in testname else 2
+            tsk, lats, lons, time = load_wrfdata(data_path, domain)
             tsk = xr.where(tsk>0, tsk, np.nan)
             tsk_list[testname] = tsk
 
-            mask = mask_lake(data_path, load_NamCo_shp())
+            mask = mask_lake(data_path, load_NamCo_shp(), testname, domain)
             tsk_NamCo = tsk.where(mask) # 切出NamCo范围
             tsk_NamCo_mean = tsk_NamCo.mean(dim=['west_east','south_north'])
             # tsk_NamCo_mean = tsk_NamCo.isel(west_east=74, south_north=39)
             
 
             ### 取3 UTC和6 UTC的平均
-            # hour_list = [3, 6]
-            hour_list = [15, 18]
+            if day_or_night == 'Day':
+                hour_list = [3, 6]
+            else:
+                hour_list = [15, 18]
             tsk_NamCo_daily = tsk_NamCo_mean.sel(Time=tsk_NamCo_mean.Time.dt.hour.isin(hour_list)).resample(Time='D').mean()
             tsk_NamCo_daily_list[testname] = tsk_NamCo_daily
 
@@ -125,13 +130,14 @@ if __name__ == '__main__':
         # 'Wuyang_90m_277K',
         'Wuyang_90m_279.5K',
         'Default_90m_277K',
+        'Default_90m_277K_ERA5',
         ]
     markers = list('P^.sxD+*p12')
     fig, ax = plt.subplots(dpi=100)
     for i, testname in enumerate(testname_list):
         var = tsk_NamCo_daily_list[testname]
 
-        var.plot.line(lw=1, marker=markers[i], mfc='none', label=labels[i], ax=ax)
+        var.plot.line(lw=0, marker=markers[i], mfc='none', label=labels[i], ax=ax)
         ax.legend(loc=2, bbox_to_anchor=(1.0,1.0), borderaxespad=0, frameon=False)
         import matplotlib.dates as mdate  
         ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))

@@ -77,22 +77,25 @@ use_lakedepth     = 1 # 是否使用静态地形数据中的湖深
 md_lakedepth      = 1 # 替换纳木错湖泊深度（一般与alternative_lake相反）
 lakedepth_default = 50. # 默认湖泊深度，use_lakedepth=0时生效
 
+### zzz强制更改wrfinput_d0x湖温
+lswt_init_flag       = False # 0: 关闭; 1:固定值替代湖温; 2:气温加减某值替代湖温
+lswt_init            = 277.
+
 ### lake option based on Wuyang (part)
 ### WRF_version  = 'WRFV3' 时方可生效
 tlake_init_flag      = True
 tlake_init_value     = 276.05
-eta_flag             = True
+eta_flag             = True # True: Wu; False: Gu
 eta_scale_yw         = 0.575 # default: 0.6
 eta_yw               = 0.1
-diffusivity_flag     = True
+diffusivity_flag     = True # True: Wu; False: Gu
 diffusivity_index_yw = 4 # default: 1
 tdmax                = 274.2
 mixing_factor        = 100 # default: 40
 mixing_factor_ked    = 40
-
-### zzz强制更改wrfinput_d0x湖温
-lswt_init_flag       = False
-lswt_init            = 277.
+roughness_flag       = True # True: Wu; False: Gu
+coszen_flag          = True # True: Wu; False: Gu
+albedo_flag          = True # True: Wu; False: Gu
 
 ### mountain
 md_mountainHeight = 0 # 修改念青唐古拉山高度
@@ -311,6 +314,9 @@ def modify_wrf_nml():
             nml_wrf['physics'].update({'tdmax':[tdmax] * max_dom})
             nml_wrf['physics'].update({'mixing_factor':[mixing_factor] * max_dom})
             nml_wrf['physics'].update({'mixing_factor_ked':[mixing_factor_ked] * max_dom})
+            nml_wrf['physics'].update({'roughness_flag':[roughness_flag] * max_dom})
+            nml_wrf['physics'].update({'coszen_flag':[coszen_flag] * max_dom})
+            nml_wrf['physics'].update({'albedo_flag':[albedo_flag] * max_dom})
 
     ### 运行WRF3.9.1版本需要添加的地方，否则会在./wrf.exe时报错
     if WRF_version == 'WRFV3':

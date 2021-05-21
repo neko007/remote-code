@@ -9,6 +9,7 @@ import cartopy.crs as ccrs
 import cmaps
 import os 
 from zMap import set_grid, add_NamCo
+from Module import load_cmfd
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -30,41 +31,31 @@ if __name__ == '__main__':
     data_dir = '/home/zzhzhao/Model/wrfout'
     testname_list = [
         'cmfd',
-        # 'obs',
-        # 'test-14',
-        # 'test-14-oriLD',
-        # 'test-19',
-        # 'test-15',
-        # 'test-15-oriLD',
-        # 'test-17',
-        # 'test-18',
-        # 'test-20',
-        # 'test-23',
-        'test-24',
-        'test-24-ERA5',
+        # 'test-25-pre',
+        # 'test-25',
+        # 'test-25-WY',
+        'test-25-WY4',
         ]
     
     N_test = len(testname_list)
     # NamCo_latlon = (30.75, 90.8)
     lat_range = (30.5, 31)
-    lon_range = (90.2, 91)
-    date_start = '2017-06-01'
-    date_end = '2017-06-30'
+    lon_range = (90, 91)
+    date_start = '2013-08-23'
+    date_end = '2013-09-01'
 
     prec_mean_list = dict()
     for testname in testname_list:
         if testname == 'cmfd':
-            file_path = "/home/zzhzhao/code/python/wrf-test-10/data/prec_CMFD_201706.nc"
-            cmfd = xr.open_dataset(file_path)['prec']
-            cmfd_mean = cmfd.sel(lat=slice(lat_range[0],lat_range[1]), lon=slice(lon_range[0],lon_range[1])).mean(dim=['lat', 'lon']).resample(time='1D').sum() * 3
-            prec_mean_list[testname] = cmfd_mean
+            cmfd = load_cmfd(date_start, date_end, lat_range, lon_range)
+            prec_mean_list[testname] = cmfd.mean(dim=['lat', 'lon']).resample(time='1D').sum()
         elif testname == 'obs':
             df = pd.read_excel('data/纳木错站2017-2018.xlsx', index_col=0)
             obs_sta = df.loc[pd.date_range(date_start, date_end)]['降水量']
             prec_mean_list[testname] = obs_sta
         else:
             data_path = os.path.join(data_dir, testname)
-            domain = 1 if 'ERA5' in testname else 2
+            domain = 1
             prec, lats, lons, time, wrflist = load_wrfdata(data_path, domain)
             prec = xr.where(prec>0, prec, np.nan)
             ### 纳木错站点插值
@@ -76,18 +67,10 @@ if __name__ == '__main__':
 
     labels = [
         'CMFD',
-        # 'StaObs',
-        # 'Wuyang_90m', 
-        # 'Wuyang_0.5m',
-        # 'Default_90m',
-        # 'Default_50m', 
-        # 'Default_0.5m',
-        # 'Wuyang_50m', 
-        # 'Wuyang_20m',
-        # 'Wuyang_90m_Update',
-        # 'Wuyang_90m_279.5K',
-        'Default_90m_277K',
-        'Default_90m_277K_ERA5',
+        # 'CTL_285K',
+        # 'CTL',
+        # 'WY',
+        'WY4',
         ]
     markers = list('PX^.sxD+*p')
     fig, ax = plt.subplots(dpi=200)

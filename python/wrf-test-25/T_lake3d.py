@@ -43,19 +43,11 @@ def mask_lake(data_dir, shp, testname, domain):
 if __name__ == '__main__':
     data_dir = '/home/zzhzhao/Model/wrfout'
     testname_list = [
-        'test-14',
-        # 'test-14-oriLD',
-        'test-19',
-        'test-15',
-        # 'test-15-oriLD',
-        'test-17',
-        # 'test-18',
-        'test-20',
-        'test-21',
-        'test-22',
-        'test-23',
-        'test-24',
-        'test-24-ERA5',
+        'test-25',
+        'test-25-WY',
+        'test-25-WY2',
+        'test-25-WY3',
+        'test-25-WY4',
         ]
     N_test = len(testname_list)
 
@@ -63,7 +55,7 @@ if __name__ == '__main__':
     tl_NamCo_mean_list = dict()
     for testname in testname_list:
         data_path = os.path.join(data_dir, testname)
-        domain = 1 if 'ERA5' in testname else 2
+        domain = 1
         tl, lats, lons, time = load_wrfdata(data_path, domain)
         tl = xr.where(tl>0, tl, np.nan)
         tl_list[testname] = tl
@@ -75,22 +67,14 @@ if __name__ == '__main__':
         tl_NamCo_mean_list[testname] = tl_NamCo_mean
         
 #%%
-    crange = np.arange(276, 282+.5, .5)
+    crange = np.arange(278, 283+.5, .5)
     cmap = 'rainbow'
     titles = [
-        'Wuyang_90m', 
-        # 'Wuyang_0.5m',
-        'Default_90m', 
-        'Default_50m', 
-        # 'Default_0.5m',
-        'Wuyang_50m', 
-        # 'Wuyang_20m',
-        'Wuyang_90m_Update',
-        'Wuyang_90m_Update2',
-        'Wuyang_90m_277K',
-        'Wuyang_90m_279.5K',
-        'Default_90m_277K',
-        'Default_90m_277K_ERA5',
+        'CTL',
+        'WY',
+        'WY2',
+        'WY3',
+        'WY4',
         ]
     ylen = np.ceil(np.sqrt(N_test)).astype(int); xlen = np.ceil(N_test/ylen).astype(int)
     default_len = 5

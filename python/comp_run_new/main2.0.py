@@ -144,9 +144,9 @@ def modify_mountainHeight(md_mountainHeight):
 
 def modify_lswt(lswt_init_flag):
     '''
-    去除念青唐古拉山
+    修正湖表温度，1：自定义温度，2：湖上气温增高某K
     '''
-    if lswt_init_flag == 1:
+    if lswt_init_flag != 0:
         print('>>>> modify LSWT <<<<')
         sp.run(f'python {comp_run_dir}/lswt.py', shell=True)
     else:

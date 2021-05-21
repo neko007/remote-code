@@ -47,9 +47,9 @@ if __name__ == '__main__':
     while(True):
         print(f"> 今天是{date.strftime('%Y年%m月%d日')}")
         modis_day, flag_day = load_modis(data_path, date, day_or_night='Day')
-        modis_night, flag_night = load_modis(data_path, date, day_or_night='Night')
-        if flag_day == True & flag_night == True:
-            modis_mean = (modis_day + modis_night) / 2
+        modis_night, flag_night = load_modis(data_path, date-pd.Timedelta('1D'), day_or_night='Night')
+        if flag_day == True or flag_night == True:
+            modis_mean = (modis_day - modis_night) * (10.5-6)/(6+1.5) + modis_night 
             break
         else:
             date += pd.Timedelta('1D')
