@@ -9,33 +9,17 @@ import cartopy.crs as ccrs
 import cmaps
 import os 
 from zMap import set_grid, add_NamCo
-from Module import load_cmfd
+from zIO import load_prec, load_cmfd, load_wrflist
 import warnings
 warnings.filterwarnings("ignore")
-
-def load_wrfdata(data_dir, domain):
-    wrf_files = [f for f in os.listdir(data_dir) if f[11]==f'{domain}']
-    wrflist = [Dataset(os.path.join(data_dir, wrf_file)) for wrf_file in wrf_files]
-
-    rainc = w.getvar(wrflist, 'RAINC', timeidx=w.ALL_TIMES, method='cat')
-    rainnc = w.getvar(wrflist, 'RAINNC', timeidx=w.ALL_TIMES, method='cat')
-    total_rain = rainc + rainnc
-
-    prec = total_rain.diff('Time', 1)
-    lats, lons = w.latlon_coords(prec)
-    time = total_rain.Time.to_index() 
-
-    return prec, lats, lons, time, wrflist
 
 if __name__ == '__main__':
     data_dir = '/home/zzhzhao/Model/wrfout'
     testname_list = [
-        'cmfd',
-        'test-25-pre',
-        # 'test-25',
-        # 'test-25-WY',
-        'test-25-WY4',
+        'modis',
         'test-25-3',
+        'test-25-NL',
+        'test-25-NM',
         ]
     
     N_test = len(testname_list)
@@ -57,7 +41,8 @@ if __name__ == '__main__':
         else:
             data_path = os.path.join(data_dir, testname)
             domain = 1
-            prec, lats, lons, time, wrflist = load_wrfdata(data_path, domain)
+            prec, lats, lons, time = load_prec(data_path, domain)
+            wrflist = load_wrflist()
             prec = xr.where(prec>0, prec, np.nan)
             ### 纳木错站点插值
             left_bottom = w.ll_to_xy(wrflist, lat_range[0], lon_range[0]).values
@@ -67,12 +52,10 @@ if __name__ == '__main__':
 
 
     labels = [
-        'CMFD',
-        'CTL_285K',
-        # 'CTL',
-        # 'WY',
-        'WY4',
-        'CTL3_285K',
+        'Modis',
+        'CTL',
+        'NL', 
+        'NM', 
         ]
     markers = list('PX^.sxD+*p')
     fig, ax = plt.subplots(dpi=200)

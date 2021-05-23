@@ -54,8 +54,8 @@ def load_modis(file_path, date_start, date_end, day_or_night):
     qc = modis[f'QC_{day_or_night}'].sel(time=pd.date_range(date_start,date_end))
     qc_lake = qc.salem.roi(shape=load_NamCo_shp())
     total_lakegrid = qc_lake.isel(time=0).count().values # 湖泊格点总数
-    modis_lake_qc = modis_lake.where(modis_lake.count(dim=['lon','lat']) >= total_lakegrid/10.) # 有效湖泊格点数>=湖泊总格点数的1/2
-    # modis_lake_qc = modis_lake_qc.where(qc_lake<127) # 63:error<1K; 127:error<2K
+    modis_lake_qc = modis_lake.where(modis_lake.count(dim=['lon','lat']) >= total_lakegrid/3.) # 有效湖泊格点数>=湖泊总格点数的1/2
+    modis_lake_qc = modis_lake_qc.where(qc_lake<127) # 63:error<1K; 127:error<2K
 
     ### 湖面空间平均
     # modis_lake_mean = modis_lake.mean(dim=['lon', 'lat'])

@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/zzhzhao/anaconda3/envs/geocat/bin/python",
+    "python.pythonPath": "/home/zzhzhao/anaconda3/bin/python",
     "jupyter.jupyterServerType": "local",
     "python.formatting.provider": "black"
 }

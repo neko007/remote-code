@@ -22,7 +22,7 @@ def load_wrfdata1(data_dir, domain):
     lats, lons = w.latlon_coords(tsk)
     time = tsk.Time.to_index() 
 
-    return tsk, lats, lons, time 
+    return tsk, lats, lons, time, wrflist
 
 def load_wrfdata2(data_dir, domain):
     wrf_files = [f for f in os.listdir(data_dir) if f[11]==f'{domain}']
@@ -78,7 +78,6 @@ if __name__ == '__main__':
         # 'test-25-WY2',
         # 'test-25-WY3',
         'test-25-WY4',
-        'test-25-2', 
         'test-25-3', 
         ]
     N_test = len(testname_list)
@@ -87,32 +86,22 @@ if __name__ == '__main__':
     tsk_list = dict()
     t2_list = dict()
 
+    lat = 30.75
+    lon = 90.75
+    
+
     for testname in testname_list:
         data_path = os.path.join(data_dir, testname)
         domain = 1 
-        tsk, lats, lons, time = load_wrfdata1(data_path, domain)
+        tsk, lats, lons, time, wrflist = load_wrfdata1(data_path, domain)
         t2, lats, lons, time = load_wrfdata2(data_path, domain)
         tsk = xr.where(tsk>0, tsk, np.nan)
-        t2 = xr.where(t2>0, t2, np.nan)
-        # t_diff = t2 - tsk       
+        t2 = xr.where(t2>0, t2, np.nan)   
 
-        mask = mask_lake(data_path, load_NamCo_shp(), testname, domain)
-        # t_diff_NamCo = t_diff.where(mask) # 切出NamCo范围
-        # t_diff_NamCo_mean = t_diff_NamCo.mean(dim=['west_east','south_north']).resample(Time='D').mean()
+        x, y = w.ll_to_xy(wrflist, lat, lon)
 
-        # t_diff_list[testname] = t_diff_NamCo_mean
-
-        t2_NamCo = t2.where(mask) # 切出NamCo范围
-        t2_NamCo_mean = t2_NamCo.mean(dim=['west_east','south_north'])#.resample(Time='D').mean()
-        tsk_NamCo = tsk.where(mask) # 切出NamCo范围
-        tsk_NamCo_mean = tsk_NamCo.mean(dim=['west_east','south_north'])#.resample(Time='D').mean()
-        t2_list[testname] = t2_NamCo_mean
-        tsk_list[testname] = tsk_NamCo_mean
-
-        ### 取3 UTC和6 UTC的平均
-        # hour_list = [3, 6]
-        # tsk_NamCo_daily = tsk_NamCo_mean.sel(Time=tsk_NamCo_mean.Time.dt.hour.isin(hour_list)).resample(Time='D').mean()
-        # tsk_NamCo_daily_list[testname] = tsk_NamCo_daily
+        t2_list[testname] = t2.sel(west_east=x, south_north=y)
+        tsk_list[testname] = tsk.sel(west_east=x, south_north=y)
 
 
 #%%
@@ -123,8 +112,7 @@ if __name__ == '__main__':
         # 'WY2',
         # 'WY3',
         'WY4',
-        'CTL2',
-        'CTL3',
+        'CTL3_285K',
         ]
 
     ylen = np.ceil(np.sqrt(N_test)).astype(int); xlen = np.ceil(N_test/ylen).astype(int)
@@ -137,8 +125,13 @@ if __name__ == '__main__':
 
         var1 = t2_list[testname]
         var2 = tsk_list[testname]
-        var1.plot.line('r', mfc='none', label='T2', ax=ax)
-        var2.plot.line('b', mfc='none', label='TSK', ax=ax)
+        # var1.plot.line('r', mfc='none', label='T2', ax=ax)
+        # var2.plot.line('b', mfc='none', label='TSK', ax=ax)
+
+        diff = (var2 - var1).resample(Time='1D').mean()
+        diff.plot.line('g', mfc='none', ax=ax)
+
+        ax.set_ylim([0, 4])
         ax.set_title(labels[i])
 
         import matplotlib.dates as mdate  

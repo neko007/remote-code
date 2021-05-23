@@ -2,14 +2,14 @@
 import wrf as w
 import numpy as np
 import xarray as xr
-from netCDF4 import Dataset
 import pandas as pd 
 import matplotlib.pyplot as plt 
 import cartopy.crs as ccrs
 import cmaps
 import os 
 import salem 
-from Module import load_wrfdata, load_NamCo_shp, mask_lake, load_modis
+from zIO import load_modis, load_t
+from zProcess import load_NamCo_shp, mask_lake
 from zMap import set_grid, add_NamCo
 import warnings
 warnings.filterwarnings("ignore")
@@ -18,14 +18,9 @@ if __name__ == '__main__':
     data_dir = '/home/zzhzhao/Model/wrfout'
     testname_list = [
         'modis',
-        'test-25',
-        'test-25-pre',
-        # 'test-25-WY',
-        # 'test-25-WY2',
-        # 'test-25-WY3',
-        'test-25-WY4',
-        'test-25-2',
         'test-25-3',
+        'test-25-NL',
+        'test-25-NM',
         ]
     N_test = len(testname_list)
 
@@ -44,7 +39,7 @@ if __name__ == '__main__':
         else:
             data_path = os.path.join(data_dir, testname)
             domain = 1 
-            tsk, lats, lons, time = load_wrfdata(data_path, domain)
+            tsk, lats, lons, time = load_t(data_path, domain, 'TSK')
             tsk = xr.where(tsk>0, tsk, np.nan)
             tsk_list[testname] = tsk
 
@@ -67,13 +62,8 @@ if __name__ == '__main__':
     labels = [
         'Modis',
         'CTL',
-        'CTL_285K',
-        # 'WY',
-        # 'WY2',
-        # 'WY3',
-        'WY4',
-        'CTL2', 
-        'CTL3_284.3K', 
+        'NL', 
+        'NM', 
         ]
     markers = list('P^.sxD+*p12')
     fig, ax = plt.subplots(dpi=100)
@@ -86,6 +76,6 @@ if __name__ == '__main__':
         import matplotlib.dates as mdate  
         ax.xaxis.set_major_formatter(mdate.DateFormatter('%m-%d'))
 
-    # fig.savefig('fig/lwst_alltest.jpg', dpi=300, bbox_inches='tight', pad_inches=0.1)
+    fig.savefig('fig/lwst_alltest.jpg', dpi=300, bbox_inches='tight', pad_inches=0.1)
 
     

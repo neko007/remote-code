@@ -6,7 +6,7 @@ from modify_nml2 import max_dom, wps_dir
 import os 
 
 def load_mountain_shp():
-    f_in = '/home/zzhzhao/code/shpfiles/念青唐古拉山shp/念青唐古拉山.shp'
+    f_in = '/home/zzhzhao/code/shpfiles/Nq_shp/Nq.shp'
     shp = geopandas.read_file(f_in, encoding='gbk')
     shp = shp.to_crs(epsg=4326)
     return shp
@@ -16,8 +16,8 @@ if __name__ == '__main__':
 
     for i in range(max_dom):
         geo_file = f'geo_em.d0{i+1}.nc'
-        with xr.open_dataset(data_dir+geo_file) as ds1:
-            with salem.open_xr_dataset(data_dir+geo_file) as ds2: # 只能以salem这种方式来读取，不然会损失grid信息
+        with xr.open_dataset(os.path.join(data_dir, geo_file)) as ds1:
+            with salem.open_xr_dataset(os.path.join(data_dir, geo_file)) as ds2: # 只能以salem这种方式来读取，不然会损失grid信息
             ### 以两种方式读取的原因是修改salem（内层）读出来的数据，然后填充进纯净的xarray读出的数据（外层）中
                 shp = load_mountain_shp()
                 hgt = ds2['HGT_M']

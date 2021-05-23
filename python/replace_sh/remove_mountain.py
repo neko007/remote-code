@@ -1,10 +1,11 @@
 #%%
+import wrf as w
 import xarray as xr
 import geopandas
 import salem
 
 def load_mountain_shp():
-    f_in = '/home/zzhzhao/code/shpfiles/念青唐古拉山shp/念青唐古拉山.shp'
+    f_in = '/home/zzhzhao/code/shpfiles/Nq_shp/Nq.shp'
     shp = geopandas.read_file(f_in, encoding='gbk')
     shp = shp.to_crs(epsg=4326)
     return shp
@@ -29,8 +30,9 @@ if __name__ == '__main__':
         hgt = ds1['HGT_M']
         hgt_new = hgt.copy()
         scale = 0.1
-        base_hight = 4718
-        new_values = (hgt.loc[dict(Time=0)] - base_hight) * scale + base_hight
+        base_height = 4718
+        # new_values = (hgt.loc[dict(Time=0)] - base_height) * scale + base_height
+        new_values = base_height
         hgt_new.loc[dict(Time=0)] = xr.where(mask, new_values, hgt.loc[dict(Time=0)])
 
         del ds1['HGT_M']
